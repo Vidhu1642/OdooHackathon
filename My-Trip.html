@@ -399,256 +399,11 @@ Connected with Create Trip Screen
 
     <!-- TRIPS -->
 
-    <div class="trip-grid">
-
-      <!-- CARD 1 -->
-
-      <div class="trip-card">
-
-        <div class="trip-image">
-
-          <img 
-            src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
-          >
-
-          <div class="trip-status">
-            Upcoming
-          </div>
-
-        </div>
-
-        <div class="trip-content">
-
-          <h2>Bali Summer Trip</h2>
-
-          <p>
-            Enjoy tropical beaches, resorts, water sports,
-            and cultural adventures in Bali.
-          </p>
-
-          <div class="trip-info">
-
-            <div class="info-box">
-
-              <h4>Duration</h4>
-
-              <span>7 Days</span>
-
-            </div>
-
-            <div class="info-box">
-
-              <h4>Budget</h4>
-
-              <span>$1800</span>
-
-            </div>
-
-            <div class="info-box">
-
-              <h4>Travelers</h4>
-
-              <span>2 People</span>
-
-            </div>
-
-            <div class="info-box">
-
-              <h4>Stops</h4>
-
-              <span>4 Cities</span>
-
-            </div>
-
-          </div>
-
-          <div class="btn-group">
-
-            <button class="btn view-btn">
-              View
-            </button>
-
-            <button class="btn edit-btn">
-              Edit
-            </button>
-
-            <button class="btn delete-btn" onclick="deleteTrip(this)">
-              Delete
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- CARD 2 -->
-
-      <div class="trip-card">
-
-        <div class="trip-image">
-
-          <img 
-            src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a"
-          >
-
-          <div class="trip-status">
-            Completed
-          </div>
-
-        </div>
-
-        <div class="trip-content">
-
-          <h2>Paris Vacation</h2>
-
-          <p>
-            Romantic getaway with museums, Eiffel Tower,
-            shopping streets, and cafes.
-          </p>
-
-          <div class="trip-info">
-
-            <div class="info-box">
-
-              <h4>Duration</h4>
-
-              <span>10 Days</span>
-
-            </div>
-
-            <div class="info-box">
-
-              <h4>Budget</h4>
-
-              <span>$3200</span>
-
-            </div>
-
-            <div class="info-box">
-
-              <h4>Travelers</h4>
-
-              <span>3 People</span>
-
-            </div>
-
-            <div class="info-box">
-
-              <h4>Stops</h4>
-
-              <span>6 Cities</span>
-
-            </div>
-
-          </div>
-
-          <div class="btn-group">
-
-            <button class="btn view-btn">
-              View
-            </button>
-
-            <button class="btn edit-btn">
-              Edit
-            </button>
-
-            <button class="btn delete-btn" onclick="deleteTrip(this)">
-              Delete
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- CARD 3 -->
-
-      <div class="trip-card">
-
-        <div class="trip-image">
-
-          <img 
-            src="https://images.unsplash.com/photo-1527631746610-bca00a040d60"
-          >
-
-          <div class="trip-status">
-            Upcoming
-          </div>
-
-        </div>
-
-        <div class="trip-content">
-
-          <h2>Tokyo Explorer</h2>
-
-          <p>
-            Discover anime culture, Japanese food,
-            temples, and futuristic city life.
-          </p>
-
-          <div class="trip-info">
-
-            <div class="info-box">
-
-              <h4>Duration</h4>
-
-              <span>12 Days</span>
-
-            </div>
-
-            <div class="info-box">
-
-              <h4>Budget</h4>
-
-              <span>$4500</span>
-
-            </div>
-
-            <div class="info-box">
-
-              <h4>Travelers</h4>
-
-              <span>1 Person</span>
-
-            </div>
-
-            <div class="info-box">
-
-              <h4>Stops</h4>
-
-              <span>8 Cities</span>
-
-            </div>
-
-          </div>
-
-          <div class="btn-group">
-
-            <button class="btn view-btn">
-              View
-            </button>
-
-            <button class="btn edit-btn">
-              Edit
-            </button>
-
-            <button class="btn delete-btn" onclick="deleteTrip(this)">
-              Delete
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
+    <div class="trip-grid" id="tripGrid"></div>
 
     <!-- EMPTY STATE -->
 
-    <div class="empty" id="emptyState">
+    <div class="empty" id="emptyState" style="display:none;">
 
       <h2>No Trips Available</h2>
 
@@ -656,7 +411,7 @@ Connected with Create Trip Screen
         Start planning your next adventure now.
       </p>
 
-      <button>
+      <button onclick="window.location.href='Create-Trip.html'">
         Create Trip
       </button>
 
@@ -666,41 +421,80 @@ Connected with Create Trip Screen
 
   <!-- JAVASCRIPT -->
 
+  <script src="backend/traveloop.js"></script>
   <script>
 
+    document.addEventListener('DOMContentLoaded', loadTrips);
+
     function createTrip(){
-
-      alert(
-        "Redirecting to Create Trip Screen..."
-      );
-
-      // Example:
-      // window.location.href = "create-trip.html";
-
+      window.location.href = 'Create-Trip.html';
     }
 
-    function deleteTrip(button){
+    async function loadTrips(){
+      try {
+        const response = await TravelLoopAPI.trips.list();
+        const tripGrid = document.getElementById('tripGrid');
+        const emptyState = document.getElementById('emptyState');
+        tripGrid.innerHTML = '';
 
-      const card = button.closest(".trip-card");
+        if (!response.trips || response.trips.length === 0) {
+          emptyState.style.display = 'block';
+          return;
+        }
 
-      card.remove();
+        emptyState.style.display = 'none';
 
-      checkEmpty();
+        response.trips.forEach(trip => {
+          const card = document.createElement('div');
+          card.className = 'trip-card';
+          card.innerHTML = `
+            <div class="trip-image">
+              <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e" />
+              <div class="trip-status">${trip.status || 'Upcoming'}</div>
+            </div>
+            <div class="trip-content">
+              <h2>${trip.name}</h2>
+              <p>${trip.description || 'No description added yet.'}</p>
+              <div class="trip-info">
+                <div class="info-box"><h4>Duration</h4><span>${trip.start_date && trip.end_date ? trip.start_date + ' to ' + trip.end_date : 'TBD'}</span></div>
+                <div class="info-box"><h4>Budget</h4><span>$${parseFloat(trip.budget || 0).toFixed(2)}</span></div>
+                <div class="info-box"><h4>Travelers</h4><span>${trip.travelers || 1} People</span></div>
+                <div class="info-box"><h4>Destination</h4><span>${trip.destination || 'Unknown'}</span></div>
+              </div>
+              <div class="btn-group">
+                <button class="btn view-btn" onclick="window.location.href='Itinerary-View.html'">View</button>
+                <button class="btn edit-btn" onclick="window.location.href='Create-Trip.html'">Edit</button>
+                <button class="btn delete-btn" data-trip-id="${trip.id}" onclick="deleteTrip(this)">Delete</button>
+              </div>
+            </div>`;
+          tripGrid.appendChild(card);
+        });
+      } catch (error) {
+        showNotification(error.message, false);
+      }
+    }
 
+    async function deleteTrip(button){
+      const tripId = button.dataset.tripId;
+      if (!tripId) {
+        return showNotification('Trip ID not found.', false);
+      }
+
+      try {
+        await TravelLoopAPI.trips.delete(tripId);
+        button.closest('.trip-card').remove();
+        checkEmpty();
+        showNotification('Trip deleted successfully.');
+      } catch (error) {
+        showNotification(error.message, false);
+      }
     }
 
     function checkEmpty(){
-
-      const cards =
-      document.querySelectorAll(".trip-card");
-
-      if(cards.length === 0){
-
-        document
-        .getElementById("emptyState")
-        .style.display = "block";
+      const cards = document.querySelectorAll('.trip-card');
+      if (cards.length === 0) {
+        document.getElementById('emptyState').style.display = 'block';
       }
-
     }
 
   </script>

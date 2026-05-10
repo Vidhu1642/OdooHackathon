@@ -245,21 +245,21 @@
             <!-- LOGIN FORM -->
             <div class="form-container">
 
-                <form class="form active" id="loginForm">
+                <form class="form active" id="loginForm" onsubmit="handleLogin(event)">
 
                     <h2>Welcome Back</h2>
 
                     <div class="input-group">
                         <label>Email</label>
-                        <input type="email" placeholder="Enter your email">
+                        <input id="loginEmail" type="email" placeholder="Enter your email">
                     </div>
 
                     <div class="input-group">
                         <label>Password</label>
-                        <input type="password" placeholder="Enter your password">
+                        <input id="loginPassword" type="password" placeholder="Enter your password">
                     </div>
 
-                    <button class="btn">
+                    <button type="submit" class="btn">
                         Login
                     </button>
 
@@ -270,31 +270,31 @@
                 </form>
 
                 <!-- SIGNUP FORM -->
-                <form class="form" id="signupForm">
+                <form class="form" id="signupForm" onsubmit="handleSignup(event)">
 
                     <h2>Create Account</h2>
 
                     <div class="input-group">
                         <label>Full Name</label>
-                        <input type="text" placeholder="Enter your full name">
+                        <input id="signupFullName" type="text" placeholder="Enter your full name">
                     </div>
 
                     <div class="input-group">
                         <label>Email</label>
-                        <input type="email" placeholder="Enter your email">
+                        <input id="signupEmail" type="email" placeholder="Enter your email">
                     </div>
 
                     <div class="input-group">
                         <label>Password</label>
-                        <input type="password" placeholder="Create password">
+                        <input id="signupPassword" type="password" placeholder="Create password">
                     </div>
 
                     <div class="input-group">
                         <label>Confirm Password</label>
-                        <input type="password" placeholder="Confirm password">
+                        <input id="signupConfirmPassword" type="password" placeholder="Confirm password">
                     </div>
 
-                    <button class="btn">
+                    <button type="submit" class="btn">
                         Create Account
                     </button>
 
@@ -325,6 +325,7 @@
 
     </div>
 
+    <script src="backend/traveloop.js"></script>
     <script>
 
         const loginForm = document.getElementById("loginForm");
@@ -339,6 +340,57 @@
 
             tabButtons[0].classList.add("active");
             tabButtons[1].classList.remove("active");
+        }
+
+        function showSignup(){
+
+            signupForm.classList.add("active");
+            loginForm.classList.remove("active");
+
+            tabButtons[1].classList.add("active");
+            tabButtons[0].classList.remove("active");
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            if (!email || !password) {
+                return showNotification('Please enter both email and password.', false);
+            }
+
+            try {
+                await TravelLoopAPI.auth.login(email, password);
+                showNotification('Login successful. Redirecting...');
+                window.location.href = 'My-Trip.html';
+            } catch (error) {
+                showNotification(error.message, false);
+            }
+        }
+
+        async function handleSignup(event) {
+            event.preventDefault();
+            const fullName = document.getElementById('signupFullName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value.trim();
+            const confirmPassword = document.getElementById('signupConfirmPassword').value.trim();
+
+            if (!fullName || !email || !password || !confirmPassword) {
+                return showNotification('Please complete all fields.', false);
+            }
+
+            if (password !== confirmPassword) {
+                return showNotification('Passwords do not match.', false);
+            }
+
+            try {
+                await TravelLoopAPI.auth.register(fullName, email, password);
+                showNotification('Account created. Redirecting...');
+                window.location.href = 'My-Trip.html';
+            } catch (error) {
+                showNotification(error.message, false);
+            }
         }
 
         function showSignup(){

@@ -405,7 +405,7 @@ Connected with Trip Notes
 
         <h3>Total Users</h3>
 
-        <h2>12.5K</h2>
+        <h2 id="adminUsersValue">12.5K</h2>
 
         <div class="growth">
           +18% This Month
@@ -417,7 +417,7 @@ Connected with Trip Notes
 
         <h3>Total Trips</h3>
 
-        <h2>8.9K</h2>
+        <h2 id="adminTripsValue">8.9K</h2>
 
         <div class="growth">
           +12% This Month
@@ -429,7 +429,7 @@ Connected with Trip Notes
 
         <h3>Active Users</h3>
 
-        <h2>5.4K</h2>
+        <h2 id="adminActiveUsersValue">5.4K</h2>
 
         <div class="growth">
           +9% This Week
@@ -441,7 +441,7 @@ Connected with Trip Notes
 
         <h3>Shared Itineraries</h3>
 
-        <h2>3.1K</h2>
+        <h2 id="adminItinerariesValue">3.1K</h2>
 
         <div class="growth">
           +25% Growth
@@ -483,7 +483,7 @@ Connected with Trip Notes
 
         <h2>Popular Destinations 🌍</h2>
 
-        <div class="destination-list">
+        <div class="destination-list" id="adminDestinationsList">
 
           <!-- ITEM -->
 
@@ -697,5 +697,48 @@ Connected with Trip Notes
 
   </div>
 
+  <script src="backend/traveloop.js"></script>
+  <script>
+    async function loadAdminStats(){
+      try {
+        const response = await TravelLoopAPI.admin.stats();
+        if (!response.stats) {
+          return;
+        }
+
+        const stats = response.stats;
+        document.getElementById('adminUsersValue').textContent = stats.users?.toLocaleString() || '0';
+        document.getElementById('adminTripsValue').textContent = stats.trips?.toLocaleString() || '0';
+        document.getElementById('adminActiveUsersValue').textContent = stats.users?.toLocaleString() || '0';
+        document.getElementById('adminItinerariesValue').textContent = stats.itineraries?.toLocaleString() || '0';
+
+        const destinationList = document.getElementById('adminDestinationsList');
+        destinationList.innerHTML = '';
+
+        if (Array.isArray(stats.popular_locations) && stats.popular_locations.length) {
+          stats.popular_locations.forEach(item => {
+            const element = document.createElement('div');
+            element.className = 'destination-item';
+            element.innerHTML = `
+              <div class="destination-left">
+                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e">
+                <div class="destination-info">
+                  <h3>${item.location}</h3>
+                  <p>${item.location}</p>
+                </div>
+              </div>
+              <div class="trip-count">${item.count?.toLocaleString() || '0'}</div>`;
+            destinationList.appendChild(element);
+          });
+        } else {
+          destinationList.innerHTML = '<div style="padding:20px;color:#6b7280;">No popular destinations available yet.</div>';
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadAdminStats);
+  </script>
 </body>
 </html>
