@@ -735,6 +735,27 @@ Connected with Shared Itinerary
       }
     }
 
+    async function loadProfile() {
+      try {
+        const response = await TravelLoopAPI.profile.load();
+        const profile = response.profile;
+
+        document.getElementById('profileFullName').value = profile.name || '';
+        document.getElementById('profileEmail').value = profile.email || '';
+        document.getElementById('profilePhone').value = profile.phone || '';
+        document.getElementById('profileLanguage').value = profile.language || 'English';
+        document.getElementById('profileBio').value = profile.bio || '';
+        document.getElementById('profilePublicProfile').checked = profile.public_profile == 1;
+        document.getElementById('profileEmailNotifications').checked = profile.email_notifications == 1;
+        document.getElementById('profileDarkMode').checked = profile.dark_mode == 1;
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        showNotification('Failed to load profile', false);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadProfile);
+
   </script>
 
 </body>
