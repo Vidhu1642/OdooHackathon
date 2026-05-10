@@ -1,0 +1,641 @@
+<!-- =========================================
+SCREEN 6 : ITINERARY VIEW SCREEN
+Traveloop Hackathon Project
+Connected with Itinerary Builder
+========================================== -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Itinerary View - Traveloop</title>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, Helvetica, sans-serif;
+    }
+
+    body{
+      background:#f3f4f6;
+      display:flex;
+    }
+
+    /* SIDEBAR */
+
+    .sidebar{
+      width:260px;
+      height:100vh;
+      background:#1e3a8a;
+      color:white;
+      padding:30px 20px;
+      position:fixed;
+      left:0;
+      top:0;
+      overflow-y:auto;
+    }
+
+    .sidebar::-webkit-scrollbar{
+      width:6px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb{
+      background:rgba(255,255,255,0.3);
+      border-radius:10px;
+    }
+
+    .logo{
+      font-size:32px;
+      font-weight:bold;
+      margin-bottom:40px;
+    }
+
+    .menu{
+      list-style:none;
+    }
+
+    .menu li{
+      margin:20px 0;
+    }
+
+    .menu a{
+      color:white;
+      text-decoration:none;
+      font-size:18px;
+      padding:12px;
+      display:block;
+      border-radius:10px;
+      transition:0.3s;
+    }
+
+    .menu a:hover{
+      background:rgba(255,255,255,0.2);
+    }
+
+    /* MAIN */
+
+    .main{
+      margin-left:260px;
+      width:calc(100% - 260px);
+      padding:40px;
+    }
+
+    /* HEADER */
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:40px;
+    }
+
+    .topbar h1{
+      font-size:38px;
+      color:#111827;
+    }
+
+    .topbar p{
+      margin-top:8px;
+      color:#6b7280;
+    }
+
+    .top-buttons{
+      display:flex;
+      gap:15px;
+    }
+
+    .btn{
+      border:none;
+      padding:14px 22px;
+      border-radius:12px;
+      font-size:15px;
+      font-weight:bold;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    .share-btn{
+      background:#2563eb;
+      color:white;
+    }
+
+    .pdf-btn{
+      background:#059669;
+      color:white;
+    }
+
+    .btn:hover{
+      opacity:0.9;
+    }
+
+    /* TRIP OVERVIEW */
+
+    .overview{
+      background:white;
+      border-radius:25px;
+      overflow:hidden;
+      margin-bottom:35px;
+      box-shadow:0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    .overview img{
+      width:100%;
+      height:350px;
+      object-fit:cover;
+    }
+
+    .overview-content{
+      padding:30px;
+    }
+
+    .overview-content h2{
+      font-size:32px;
+      color:#111827;
+      margin-bottom:15px;
+    }
+
+    .overview-content p{
+      color:#6b7280;
+      line-height:1.8;
+    }
+
+    /* STATS */
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:20px;
+      margin-top:30px;
+    }
+
+    .stat-card{
+      background:#eff6ff;
+      padding:20px;
+      border-radius:15px;
+    }
+
+    .stat-card h3{
+      color:#2563eb;
+      margin-bottom:10px;
+    }
+
+    .stat-card span{
+      font-size:22px;
+      font-weight:bold;
+      color:#111827;
+    }
+
+    /* TIMELINE */
+
+    .timeline-section{
+      margin-top:40px;
+    }
+
+    .section-title{
+      font-size:32px;
+      color:#111827;
+      margin-bottom:30px;
+    }
+
+    .timeline{
+      position:relative;
+      padding-left:40px;
+    }
+
+    .timeline::before{
+      content:'';
+      position:absolute;
+      left:12px;
+      top:0;
+      width:4px;
+      height:100%;
+      background:#2563eb;
+    }
+
+    .timeline-card{
+      position:relative;
+      background:white;
+      border-radius:20px;
+      padding:25px;
+      margin-bottom:30px;
+      box-shadow:0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    .timeline-card::before{
+      content:'';
+      position:absolute;
+      left:-36px;
+      top:35px;
+      width:22px;
+      height:22px;
+      border-radius:50%;
+      background:#2563eb;
+      border:5px solid #dbeafe;
+    }
+
+    .timeline-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+      gap:15px;
+    }
+
+    .timeline-header h2{
+      color:#111827;
+    }
+
+    .timeline-header span{
+      background:#dbeafe;
+      color:#2563eb;
+      padding:10px 16px;
+      border-radius:20px;
+      font-weight:bold;
+    }
+
+    /* ACTIVITY */
+
+    .activity{
+      background:#f9fafb;
+      padding:18px;
+      border-radius:15px;
+      margin-bottom:15px;
+    }
+
+    .activity h3{
+      color:#2563eb;
+      margin-bottom:10px;
+    }
+
+    .activity p{
+      color:#6b7280;
+      margin-bottom:10px;
+      line-height:1.6;
+    }
+
+    .activity-info{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .cost{
+      color:#059669;
+      font-weight:bold;
+    }
+
+    /* MAP */
+
+    .map-section{
+      margin-top:40px;
+      background:white;
+      padding:25px;
+      border-radius:20px;
+      box-shadow:0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    .map-section h2{
+      margin-bottom:20px;
+      color:#111827;
+    }
+
+    .map-placeholder{
+      height:350px;
+      border-radius:20px;
+      overflow:hidden;
+    }
+
+    .map-placeholder img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    /* RESPONSIVE */
+
+    @media(max-width:1000px){
+
+      .sidebar{
+        display:none;
+      }
+
+      .main{
+        margin-left:0;
+        width:100%;
+      }
+
+      .topbar{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:20px;
+      }
+
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+
+  <div class="sidebar">
+
+    <div class="logo">
+      Traveloop
+    </div>
+
+<ul class="menu">
+  <li><a href="Dashboard.html">🏠 Dashboard</a></li>
+  <li><a href="Create-Trip.html">✈ Create Trip</a></li>
+  <li><a href="My-Trip.html">🧳 My Trips</a></li>
+  <li><a href="Itinerary.html">📅 Build Itinerary</a></li>
+  <li><a href="Itinerary-View.html">🗺 Itinerary View</a></li>
+  <li><a href="Search.html">🌍 City Search</a></li>
+  <li><a href="Activity-Search.html">🎯 Activity Search</a></li>
+  <li><a href="Budget-Cost.html">💰 Budget Planner</a></li>
+  <li><a href="Packing.html">🎒 Packing Checklist</a></li>
+  <li><a href="Public-Itinerary-View.html">🌐 Community Trips</a></li>
+  <li><a href="Trip-Notes.html">📝 Trip Notes</a></li>
+  <li><a href="Profile.html">👤 Profile & Settings</a></li>
+  <li><a href="Admin-Dashboard.html">📊 Admin Analytics</a></li>
+  <li><a href="index.html">🚪 Logout</a></li>
+</ul>
+
+  </div>
+
+  <!-- MAIN -->
+
+  <div class="main">
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+      <div>
+
+        <h1>Trip Itinerary 📅</h1>
+
+        <p>
+          Review your complete travel journey
+        </p>
+
+      </div>
+
+      <div class="top-buttons">
+
+        <button class="btn share-btn"
+          onclick="shareTrip()">
+
+          Share Trip
+
+        </button>
+
+        <button class="btn pdf-btn"
+          onclick="downloadPDF()">
+
+          Download PDF
+
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- OVERVIEW -->
+
+    <div class="overview">
+
+      <img 
+        src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
+      >
+
+      <div class="overview-content">
+
+        <h2>Bali & Tokyo Adventure</h2>
+
+        <p>
+          Explore tropical beaches in Bali and
+          futuristic city life in Tokyo. This
+          itinerary combines relaxation,
+          adventure, food tours, shopping,
+          and cultural experiences.
+        </p>
+
+        <!-- STATS -->
+
+        <div class="stats">
+
+          <div class="stat-card">
+
+            <h3>Total Days</h3>
+
+            <span>12 Days</span>
+
+          </div>
+
+          <div class="stat-card">
+
+            <h3>Cities</h3>
+
+            <span>2 Stops</span>
+
+          </div>
+
+          <div class="stat-card">
+
+            <h3>Activities</h3>
+
+            <span>8 Activities</span>
+
+          </div>
+
+          <div class="stat-card">
+
+            <h3>Budget</h3>
+
+            <span>$2500</span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TIMELINE -->
+
+    <div class="timeline-section">
+
+      <h2 class="section-title">
+        Travel Timeline
+      </h2>
+
+      <div class="timeline">
+
+        <!-- DAY 1 -->
+
+        <div class="timeline-card">
+
+          <div class="timeline-header">
+
+            <h2>Day 1 - Bali</h2>
+
+            <span>March 12</span>
+
+          </div>
+
+          <div class="activity">
+
+            <h3>🏖 Beach Exploration</h3>
+
+            <p>
+              Visit Kuta Beach and enjoy
+              beautiful sunset views.
+            </p>
+
+            <div class="activity-info">
+
+              <span>⏰ 3 Hours</span>
+
+              <span class="cost">
+                $80
+              </span>
+
+            </div>
+
+          </div>
+
+          <div class="activity">
+
+            <h3>🍜 Food Tour</h3>
+
+            <p>
+              Explore authentic Indonesian
+              cuisine and street food.
+            </p>
+
+            <div class="activity-info">
+
+              <span>⏰ 2 Hours</span>
+
+              <span class="cost">
+                $50
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- DAY 5 -->
+
+        <div class="timeline-card">
+
+          <div class="timeline-header">
+
+            <h2>Day 5 - Tokyo</h2>
+
+            <span>March 17</span>
+
+          </div>
+
+          <div class="activity">
+
+            <h3>🎌 Anime District Tour</h3>
+
+            <p>
+              Explore Akihabara and discover
+              gaming cafes and anime stores.
+            </p>
+
+            <div class="activity-info">
+
+              <span>⏰ 5 Hours</span>
+
+              <span class="cost">
+                $120
+              </span>
+
+            </div>
+
+          </div>
+
+          <div class="activity">
+
+            <h3>🍣 Sushi Experience</h3>
+
+            <p>
+              Traditional Japanese sushi
+              dining experience.
+            </p>
+
+            <div class="activity-info">
+
+              <span>⏰ 2 Hours</span>
+
+              <span class="cost">
+                $90
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- MAP -->
+
+    <div class="map-section">
+
+      <h2>Trip Route Map 🌍</h2>
+
+      <div class="map-placeholder">
+
+        <img 
+          src="https://images.unsplash.com/photo-1524661135-423995f22d0b"
+        >
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT -->
+
+  <script>
+
+    function shareTrip(){
+
+      alert(
+        "Trip Share Link Generated!"
+      );
+
+    }
+
+    function downloadPDF(){
+
+      alert(
+        "Downloading Itinerary PDF..."
+      );
+
+    }
+
+  </script>
+
+</body>
+</html>

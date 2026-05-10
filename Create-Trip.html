@@ -1,0 +1,522 @@
+<!-- =========================================
+SCREEN 3 : CREATE TRIP SCREEN
+Traveloop Hackathon Project
+Connected with Dashboard
+========================================== -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Trip - Traveloop</title>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, Helvetica, sans-serif;
+    }
+
+    body{
+      background:#f3f4f6;
+      display:flex;
+    }
+
+    /* SIDEBAR */
+
+    .sidebar{
+      width:260px;
+      height:100vh;
+      background:#1e3a8a;
+      color:white;
+      padding:30px 20px;
+      position:fixed;
+      left:0;
+      top:0;
+      overflow-y:auto;
+    }
+
+    .sidebar::-webkit-scrollbar{
+      width:6px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb{
+      background:rgba(255,255,255,0.3);
+      border-radius:10px;
+    }
+
+    .logo{
+      font-size:32px;
+      font-weight:bold;
+      margin-bottom:40px;
+    }
+
+    .menu{
+      list-style:none;
+    }
+
+    .menu li{
+      margin:20px 0;
+    }
+
+    .menu a{
+      color:white;
+      text-decoration:none;
+      font-size:18px;
+      padding:12px;
+      display:block;
+      border-radius:10px;
+      transition:0.3s;
+    }
+
+    .menu a:hover{
+      background:rgba(255,255,255,0.2);
+    }
+
+    /* MAIN CONTENT */
+
+    .main{
+      margin-left:260px;
+      width:calc(100% - 260px);
+      padding:40px;
+    }
+
+    /* TOPBAR */
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:40px;
+    }
+
+    .topbar h1{
+      font-size:38px;
+      color:#111827;
+    }
+
+    .topbar p{
+      color:#6b7280;
+      margin-top:8px;
+    }
+
+    .profile{
+      display:flex;
+      align-items:center;
+      gap:15px;
+    }
+
+    .profile img{
+      width:50px;
+      height:50px;
+      border-radius:50%;
+      object-fit:cover;
+    }
+
+    /* FORM CONTAINER */
+
+    .form-container{
+      background:white;
+      padding:40px;
+      border-radius:25px;
+      box-shadow:0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:25px;
+    }
+
+    .input-group{
+      display:flex;
+      flex-direction:column;
+    }
+
+    .input-group label{
+      margin-bottom:10px;
+      font-weight:bold;
+      color:#374151;
+    }
+
+    .input-group input,
+    .input-group textarea,
+    .input-group select{
+      padding:15px;
+      border:1px solid #d1d5db;
+      border-radius:12px;
+      font-size:16px;
+    }
+
+    .input-group textarea{
+      resize:none;
+      height:130px;
+    }
+
+    .input-group input:focus,
+    .input-group textarea:focus,
+    .input-group select:focus{
+      border-color:#2563eb;
+      outline:none;
+    }
+
+    .full-width{
+      grid-column:1/3;
+    }
+
+    /* IMAGE UPLOAD */
+
+    .upload-box{
+      border:2px dashed #cbd5e1;
+      border-radius:15px;
+      padding:40px;
+      text-align:center;
+      cursor:pointer;
+      transition:0.3s;
+      background:#f8fafc;
+    }
+
+    .upload-box:hover{
+      background:#eff6ff;
+      border-color:#2563eb;
+    }
+
+    .upload-box p{
+      color:#6b7280;
+      margin-top:10px;
+    }
+
+    /* BUTTONS */
+
+    .btn-group{
+      margin-top:35px;
+      display:flex;
+      gap:20px;
+    }
+
+    .create-btn{
+      background:#2563eb;
+      color:white;
+      border:none;
+      padding:16px 28px;
+      border-radius:12px;
+      font-size:17px;
+      font-weight:bold;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    .create-btn:hover{
+      background:#1d4ed8;
+    }
+
+    .cancel-btn{
+      background:#e5e7eb;
+      color:#111827;
+      border:none;
+      padding:16px 28px;
+      border-radius:12px;
+      font-size:17px;
+      font-weight:bold;
+      cursor:pointer;
+    }
+
+    /* QUICK TIPS */
+
+    .tips{
+      margin-top:40px;
+      background:#eff6ff;
+      border-left:6px solid #2563eb;
+      padding:25px;
+      border-radius:15px;
+    }
+
+    .tips h3{
+      margin-bottom:15px;
+      color:#1e3a8a;
+    }
+
+    .tips ul{
+      padding-left:20px;
+      color:#374151;
+      line-height:1.8;
+    }
+
+    /* RESPONSIVE */
+
+    @media(max-width:900px){
+
+      .sidebar{
+        display:none;
+      }
+
+      .main{
+        margin-left:0;
+        width:100%;
+        padding:20px;
+      }
+
+      .form-grid{
+        grid-template-columns:1fr;
+      }
+
+      .full-width{
+        grid-column:1/2;
+      }
+
+      .topbar{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:20px;
+      }
+
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+
+  <div class="sidebar">
+
+    <div class="logo">
+      Traveloop
+    </div>
+
+<ul class="menu">
+  <li><a href="Dashboard.html">🏠 Dashboard</a></li>
+  <li><a href="Create-Trip.html">✈ Create Trip</a></li>
+  <li><a href="My-Trip.html">🧳 My Trips</a></li>
+  <li><a href="Itinerary.html">📅 Build Itinerary</a></li>
+  <li><a href="Itinerary-View.html">🗺 Itinerary View</a></li>
+  <li><a href="Search.html">🌍 City Search</a></li>
+  <li><a href="Activity-Search.html">🎯 Activity Search</a></li>
+  <li><a href="Budget-Cost.html">💰 Budget Planner</a></li>
+  <li><a href="Packing.html">🎒 Packing Checklist</a></li>
+  <li><a href="Public-Itinerary-View.html">🌐 Community Trips</a></li>
+  <li><a href="Trip-Notes.html">📝 Trip Notes</a></li>
+  <li><a href="Profile.html">👤 Profile & Settings</a></li>
+  <li><a href="Admin-Dashboard.html">📊 Admin Analytics</a></li>
+  <li><a href="index.html">🚪 Logout</a></li>
+</ul>
+
+  </div>
+
+  <!-- MAIN -->
+
+  <div class="main">
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+      <div>
+
+        <h1>Create New Trip ✈</h1>
+
+        <p>
+          Start planning your next unforgettable journey
+        </p>
+
+      </div>
+
+      <div class="profile">
+
+        <img 
+          src="https://i.pravatar.cc/150?img=12"
+          alt=""
+        >
+
+      </div>
+
+    </div>
+
+    <!-- FORM -->
+
+    <div class="form-container">
+
+      <div class="form-grid">
+
+        <!-- TRIP NAME -->
+
+        <div class="input-group">
+
+          <label>Trip Name</label>
+
+          <input 
+            type="text"
+            placeholder="Enter trip name"
+          >
+
+        </div>
+
+        <!-- DESTINATION -->
+
+        <div class="input-group">
+
+          <label>Main Destination</label>
+
+          <input 
+            type="text"
+            placeholder="Enter destination"
+          >
+
+        </div>
+
+        <!-- START DATE -->
+
+        <div class="input-group">
+
+          <label>Start Date</label>
+
+          <input type="date">
+
+        </div>
+
+        <!-- END DATE -->
+
+        <div class="input-group">
+
+          <label>End Date</label>
+
+          <input type="date">
+
+        </div>
+
+        <!-- TRAVELERS -->
+
+        <div class="input-group">
+
+          <label>Travelers</label>
+
+          <select>
+
+            <option>1 Person</option>
+            <option>2 People</option>
+            <option>3 People</option>
+            <option>4+ People</option>
+
+          </select>
+
+        </div>
+
+        <!-- BUDGET -->
+
+        <div class="input-group">
+
+          <label>Estimated Budget</label>
+
+          <input 
+            type="number"
+            placeholder="Enter estimated budget"
+          >
+
+        </div>
+
+        <!-- DESCRIPTION -->
+
+        <div class="input-group full-width">
+
+          <label>Trip Description</label>
+
+          <textarea 
+            placeholder="Describe your trip plan, activities, goals, and travel preferences..."
+          ></textarea>
+
+        </div>
+
+        <!-- COVER PHOTO -->
+
+        <div class="input-group full-width">
+
+          <label>Upload Cover Photo</label>
+
+          <div class="upload-box">
+
+            <h2>📷 Upload Travel Image</h2>
+
+            <p>
+              Drag & Drop or Click to Upload
+            </p>
+
+            <input 
+              type="file"
+              style="margin-top:20px;"
+            >
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- BUTTONS -->
+
+      <div class="btn-group">
+
+        <button class="create-btn" onclick="createTrip()">
+          Create Trip
+        </button>
+
+        <button class="cancel-btn">
+          Cancel
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- TIPS -->
+
+    <div class="tips">
+
+      <h3>💡 Travel Planning Tips</h3>
+
+      <ul>
+
+        <li>
+          Plan your destinations according to weather and season.
+        </li>
+
+        <li>
+          Set a realistic travel budget including hotels and transport.
+        </li>
+
+        <li>
+          Keep emergency funds for unexpected situations.
+        </li>
+
+        <li>
+          Add activities and sightseeing plans early for better organization.
+        </li>
+
+      </ul>
+
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT -->
+
+  <script>
+
+    function createTrip(){
+
+      alert(
+        "Trip Created Successfully! Redirecting to My Trips..."
+      );
+
+      // Example redirect
+      // window.location.href = "mytrips.html";
+
+    }
+
+  </script>
+
+</body>
+</html>
