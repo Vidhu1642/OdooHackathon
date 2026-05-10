@@ -730,13 +730,13 @@ Connected with Budget Planner
   <script src="backend/traveloop.js"></script>
   <script>
 
-    const packingItems = {
-      clothing: [],
-      documents: [],
-      electronics: [],
-      toiletries: [],
-      other: []
+    const categoryOrder = ['clothing', 'documents', 'electronics'];
+    const defaultPackingItems = {
+      clothing: [{ text: 'T-Shirts', packed: true }, { text: 'Jackets', packed: false }, { text: 'Shoes', packed: true }],
+      documents: [{ text: 'Passport', packed: true }, { text: 'Flight Tickets', packed: true }, { text: 'Travel Insurance', packed: false }],
+      electronics: [{ text: 'Mobile Charger', packed: true }, { text: 'Power Bank', packed: false }, { text: 'Camera', packed: true }]
     };
+    let packingItems = JSON.parse(JSON.stringify(defaultPackingItems));
 
     function togglePacked(checkbox){
       const itemText = checkbox.nextElementSibling;
@@ -745,6 +745,7 @@ Connected with Budget Planner
       }else{
         itemText.classList.remove("packed");
       }
+      syncFromDom();
       savePacking();
     }
 
@@ -758,27 +759,16 @@ Connected with Budget Planner
         return;
       }
 
-      const checkItem = document.createElement('div');
-      checkItem.className = 'check-item';
-      checkItem.innerHTML = `
-        <div class="item-left">
-          <input type="checkbox" onchange="togglePacked(this)">
-          <span class="item-name">${itemText}</span>
-        </div>
-        <button class="delete-btn" onclick="deletePackingItem(this, '${category}')">Delete</button>`;
-      
-      container.insertBefore(checkItem, input.parentElement);
+      packingItems[category].push({ text: itemText, packed: false });
       input.value = '';
-      packingItems[category].push(itemText);
-      updateCategoryCount(category);
+      renderPacking();
       savePacking();
     }
 
     function deletePackingItem(btn, category){
-      const itemText = btn.parentElement.querySelector('.item-name').textContent;
-      packingItems[category] = packingItems[category].filter(item => item !== itemText);
-      btn.parentElement.remove();
-      updateCategoryCount(category);
+      const index = Number(btn.closest('.check-item').dataset.index);
+      packingItems[category].splice(index, 1);
+      renderPacking();
       savePacking();
     }
 
@@ -788,6 +778,52 @@ Connected with Budget Planner
       container.querySelector('.category-count').textContent = `${count} Items`;
     }
 
+    function renderPacking() {
+      categoryOrder.forEach(category => {
+        const container = document.querySelector(`[data-category="${category}"]`);
+        const addBox = container.querySelector('.add-item-box');
+        container.querySelectorAll('.check-item').forEach(item => item.remove());
+        (packingItems[category] || []).forEach((item, index) => {
+          const checkItem = document.createElement('div');
+          checkItem.className = 'check-item';
+          checkItem.dataset.index = index;
+          checkItem.innerHTML = `
+            <div class="item-left">
+              <input type="checkbox" ${item.packed ? 'checked' : ''} onchange="togglePacked(this)">
+              <span class="item-name ${item.packed ? 'packed' : ''}">${escapeHtml(item.text || item)}</span>
+            </div>
+            <button class="delete-btn" onclick="deletePackingItem(this, '${category}')">Delete</button>`;
+          container.insertBefore(checkItem, addBox);
+        });
+        updateCategoryCount(category);
+      });
+      updatePackingProgress();
+    }
+
+    function syncFromDom() {
+      categoryOrder.forEach(category => {
+        const container = document.querySelector(`[data-category="${category}"]`);
+        packingItems[category] = Array.from(container.querySelectorAll('.check-item')).map(item => ({
+          text: item.querySelector('.item-name').textContent.trim(),
+          packed: item.querySelector('input[type="checkbox"]').checked
+        }));
+      });
+      updatePackingProgress();
+    }
+
+    function updatePackingProgress() {
+      const allItems = categoryOrder.flatMap(category => packingItems[category] || []);
+      const packed = allItems.filter(item => item.packed).length;
+      const total = allItems.length;
+      const percent = total ? Math.round((packed / total) * 100) : 0;
+      const summaryNumbers = document.querySelectorAll('.summary-card h2');
+      if (summaryNumbers[0]) summaryNumbers[0].textContent = total;
+      if (summaryNumbers[1]) summaryNumbers[1].textContent = packed;
+      if (summaryNumbers[2]) summaryNumbers[2].textContent = Math.max(0, total - packed);
+      document.querySelector('.progress-fill').style.width = `${percent}%`;
+      document.querySelector('.progress-text').textContent = `${percent}% completed - ${packed} out of ${total} items packed`;
+    }
+
     function savePacking(){
       localStorage.setItem('packingItems', JSON.stringify(packingItems));
     }
@@ -795,8 +831,22 @@ Connected with Budget Planner
     function loadPacking(){
       const saved = localStorage.getItem('packingItems');
       if (saved) {
-        Object.assign(packingItems, JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        categoryOrder.forEach(category => {
+          if (Array.isArray(parsed[category])) {
+            packingItems[category] = parsed[category].map(item => typeof item === 'string' ? { text: item, packed: false } : item);
+          }
+        });
       }
+      document.querySelectorAll('.category-card').forEach((card, index) => {
+        card.dataset.category = categoryOrder[index];
+        const button = card.querySelector('.small-btn');
+        if (button) button.onclick = () => addPackingItem(categoryOrder[index]);
+        card.querySelectorAll('.delete-btn').forEach(button => {
+          button.onclick = () => deletePackingItem(button, categoryOrder[index]);
+        });
+      });
+      renderPacking();
     }
 
     function resetChecklist(){

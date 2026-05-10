@@ -670,6 +670,9 @@ Connected with Activity Search
             option.textContent = `${trip.name} (${trip.destination || 'Trip'})`;
             tripSelect.appendChild(option);
           });
+          if (getParam('trip_id')) {
+            tripSelect.value = getParam('trip_id');
+          }
           if (!tripSelect.value) {
             tripSelect.value = response.trips[0].id;
           }
@@ -749,8 +752,30 @@ Connected with Activity Search
     }
 
     function exportBudget(){
-      showNotification('Budget report exported successfully.');
+      const tripName = document.getElementById('budgetTripSelect').selectedOptions[0]?.textContent || 'Trip';
+      const report = [
+        `Budget report for ${tripName}`,
+        `Total budget: ${document.getElementById('totalBudgetValue').textContent}`,
+        `Expenses: ${document.getElementById('totalExpenseValue').textContent}`,
+        `Remaining: ${document.getElementById('remainingBudgetValue').textContent}`,
+        '',
+        document.getElementById('budgetNotesInput').value.trim()
+      ].join('\n');
+      navigator.clipboard?.writeText(report);
+      showNotification('Budget report copied.');
     }
+
+    ['budgetTotalInput', 'budgetExpensesInput'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => {
+        const total = Number(document.getElementById('budgetTotalInput').value || 0);
+        const expenses = Number(document.getElementById('budgetExpensesInput').value || 0);
+        const remaining = total - expenses;
+        document.getElementById('totalBudgetValue').textContent = formatMoney(total);
+        document.getElementById('totalExpenseValue').textContent = formatMoney(expenses);
+        document.getElementById('remainingBudgetValue').textContent = formatMoney(remaining);
+        document.getElementById('avgPerDayValue').textContent = formatMoney(Math.max(0, remaining / 7));
+      });
+    });
 
     document.addEventListener('DOMContentLoaded', initializeBudgetPage);
 

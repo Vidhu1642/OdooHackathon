@@ -22,7 +22,8 @@ const TravelLoopAPI = (() => {
         }
 
         const response = await fetch(url, options);
-        const data = await response.json();
+        const text = await response.text();
+        const data = text ? JSON.parse(text) : {};
         if (!response.ok || data.success === false) {
             throw new Error(data.message || 'Backend request failed');
         }
@@ -46,6 +47,7 @@ const TravelLoopAPI = (() => {
         itinerary: {
             save: data => request('itinerary.php?action=save', data),
             load: itinerary_id => request('itinerary.php?action=load', { itinerary_id }, 'GET'),
+            loadByTrip: trip_id => request('itinerary.php?action=load_by_trip', { trip_id }, 'GET'),
             share: token => request('itinerary.php?action=share', { token }, 'GET'),
         },
         budget: {
@@ -69,9 +71,51 @@ const TravelLoopAPI = (() => {
         },
         admin: {
             stats: () => request('admin.php', {}, 'GET'),
+            deleteUser: user_id => request('admin.php?action=delete_user', { user_id }),
         }
     };
 })();
+
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[char]));
+}
+
+function getParam(name) {
+    return new URLSearchParams(window.location.search).get(name);
+}
+
+function formatMoney(value, currency = 'USD') {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency,
+        maximumFractionDigits: 0
+    }).format(Number(value || 0));
+}
+
+function formatDate(value) {
+    if (!value) {
+        return 'Not set';
+    }
+    const date = new Date(value);
+    return Number.isNaN(date.getTime())
+        ? 'Not set'
+        : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function daysBetween(start, end) {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+        return 0;
+    }
+    return Math.max(1, Math.ceil((endDate - startDate) / 86400000) + 1);
+}
 
 function showNotification(message, success = true) {
     let toast = document.getElementById('appToast');

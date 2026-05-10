@@ -706,39 +706,70 @@ Connected with Itinerary Builder
 
   <script src="backend/traveloop.js"></script>
 <script>
+  function resultCard(item) {
+    const name = item.name || item.destination || item.title || 'Destination';
+    const loc = item.location || item.destination || 'Location not set';
+    return `
+      <div class="city-card">
+        <div class="city-image">
+          <img src="${escapeHtml(item.cover_photo || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e')}">
+          <div class="country-badge">${escapeHtml(loc)}</div>
+        </div>
+        <div class="city-content">
+          <h2>${escapeHtml(name)}</h2>
+          <p>${escapeHtml(item.description || 'Explore this destination in your next trip plan.')}</p>
+          <button class="add-btn" data-destination="${escapeHtml(name)}">Add to Trip</button>
+        </div>
+      </div>`;
+  }
+
   async function searchCity() {
     const query = document.getElementById('citySearchQuery').value.trim();
+    if (!query) {
+      showNotification('Enter a city or destination to search.', false);
+      return;
+    }
     try {
       const response = await TravelLoopAPI.search.query(query); //
       const cityGrid = document.querySelector('.city-grid');
-      cityGrid.innerHTML = '';
 
       // Results are pulled from activities_catalog and trips tables
-      const allResults = [...response.results.activities, ...response.results.trips];
+      const allResults = [...(response.results.activities || []), ...(response.results.trips || [])];
+      cityGrid.innerHTML = allResults.length
+        ? allResults.map(resultCard).join('')
+        : '<p style="color:#6b7280;">No matching destinations found.</p>';
+    } catch (e) {
+      showNotification('Search failed: ' + e.message, false);
+    }
+  }
 
-      allResults.forEach(item => {
-        const name = item.name;
-        const loc = item.location || item.destination;
-        const card = document.createElement('div');
-        card.className = 'city-card';
-        card.innerHTML = `
-          <div class="city-image">
-            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e">
-            <div class="country-badge">${loc}</div>
-          </div>
-          <div class="city-content">
-            <h2>${name}</h2>
-            <p>${item.description || 'Explore this beautiful destination.'}</p>
-            <button class="add-btn" onclick="addToTrip('${name}')">Add to Trip</button>
-          </div>`;
-        cityGrid.appendChild(card);
+  async function addToTrip(name) {
+    try {
+      const response = await TravelLoopAPI.trips.create({
+        name: `${name} Trip`,
+        destination: name,
+        start_date: null,
+        end_date: null,
+        travelers: 1,
+        budget: 0,
+        description: `Trip idea from city search: ${name}`,
+        cover_photo: '',
+        status: 'Planning'
       });
-    } catch (e) { alert("Search failed: " + e.message); }
+      showNotification(`${name} trip created.`);
+      window.location.href = `Itinerary.html?trip_id=${response.trip_id}`;
+    } catch (error) {
+      showNotification(error.message, false);
+    }
   }
 
-  function addToTrip(name) {
-    alert(name + " has been added to your trip plan!");
-  }
+  document.querySelector('.city-grid').addEventListener('click', event => {
+    const button = event.target.closest('.add-btn[data-destination]');
+    if (button) addToTrip(button.dataset.destination);
+  });
+  document.getElementById('citySearchQuery').addEventListener('keydown', event => {
+    if (event.key === 'Enter') searchCity();
+  });
 </script>
 
 </body>

@@ -422,13 +422,13 @@ Connected with Shared Itinerary
 
       <div class="profile-card">
 
-        <img 
+        <img id="profileAvatar"
           src="https://i.pravatar.cc/150?img=12"
         >
 
-        <h2>Alex Johnson</h2>
+        <h2 id="profileDisplayName">Alex Johnson</h2>
 
-        <p>
+        <p id="profileDisplayBio">
           Travel Enthusiast & Adventure Explorer
         </p>
 
@@ -442,7 +442,7 @@ Connected with Shared Itinerary
 
             <h3>Total Trips</h3>
 
-            <span>18</span>
+            <span id="profileTripCount">0</span>
 
           </div>
 
@@ -450,7 +450,7 @@ Connected with Shared Itinerary
 
             <h3>Countries</h3>
 
-            <span>12</span>
+            <span id="profileCountryCount">0</span>
 
           </div>
 
@@ -458,7 +458,7 @@ Connected with Shared Itinerary
 
             <h3>Activities</h3>
 
-            <span>95</span>
+            <span id="profileActivityCount">0</span>
 
           </div>
 
@@ -466,7 +466,7 @@ Connected with Shared Itinerary
 
             <h3>Followers</h3>
 
-            <span>420</span>
+            <span id="profileFollowerCount">0</span>
 
           </div>
 
@@ -682,6 +682,18 @@ Connected with Shared Itinerary
         document.getElementById('profilePublicProfile').checked = Boolean(profile.public_profile);
         document.getElementById('profileEmailNotifications').checked = Boolean(profile.email_notifications);
         document.getElementById('profileDarkMode').checked = Boolean(profile.dark_mode);
+        document.getElementById('profileDisplayName').textContent = profile.full_name || 'Traveler';
+        document.getElementById('profileDisplayBio').textContent = profile.bio || 'Travel Enthusiast & Adventure Explorer';
+        if (profile.avatar) {
+          document.getElementById('profileAvatar').src = profile.avatar;
+        }
+
+        const tripsResponse = await TravelLoopAPI.trips.list();
+        const trips = tripsResponse.trips || [];
+        document.getElementById('profileTripCount').textContent = trips.length;
+        document.getElementById('profileCountryCount').textContent = new Set(trips.map(trip => (trip.destination || '').trim().toLowerCase()).filter(Boolean)).size;
+        document.getElementById('profileActivityCount').textContent = '-';
+        document.getElementById('profileFollowerCount').textContent = profile.public_profile ? 'Public' : 'Private';
       } catch (error) {
         showNotification(error.message, false);
       }
@@ -700,6 +712,9 @@ Connected with Shared Itinerary
         });
 
         showNotification('Profile Settings Saved Successfully!');
+        document.getElementById('profileDisplayName').textContent = document.getElementById('profileFullName').value.trim() || 'Traveler';
+        document.getElementById('profileDisplayBio').textContent = document.getElementById('profileBio').value.trim() || 'Travel Enthusiast & Adventure Explorer';
+        document.getElementById('profileFollowerCount').textContent = document.getElementById('profilePublicProfile').checked ? 'Public' : 'Private';
       } catch (error) {
         showNotification(error.message, false);
       }

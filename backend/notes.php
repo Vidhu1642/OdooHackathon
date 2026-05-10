@@ -12,8 +12,8 @@ switch ($action) {
             jsonResponse(['success' => false, 'message' => 'Note title is required.'], 400);
         }
 
-        $stmt = $pdo->prepare('INSERT INTO notes (user_id, trip_id, title, body, tag, created_at, last_edited)
-            VALUES (?, ?, ?, ?, ?, NOW(), NOW())');
+        $stmt = $pdo->prepare('INSERT INTO notes (user_id, trip_id, title, body, tag, last_edited)
+            VALUES (?, ?, ?, ?, ?, NOW())');
         $stmt->execute([
             $userId,
             $input['trip_id'] ?: null,

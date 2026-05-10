@@ -403,8 +403,8 @@ Traveloop Hackathon Project
 
       tableBody.innerHTML = users.map(user => `
         <tr>
-          <td>${user.name || 'Unknown User'}</td>
-          <td>${user.email || 'N/A'}</td>
+          <td>${escapeHtml(user.name || 'Unknown User')}</td>
+          <td>${escapeHtml(user.email || 'N/A')}</td>
           <td>${user.trip_count || 0}</td>
           <td>
             <span class="status ${user.active ? 'active' : 'inactive'}">
@@ -423,17 +423,17 @@ Traveloop Hackathon Project
      * Action Handlers
      */
     function viewUser(id) {
-      alert("Viewing user ID: " + id);
+      showNotification("Viewing user ID: " + id);
     }
 
     async function deleteUser(id) {
       if(confirm("Are you sure you want to delete this user?")) {
         try {
-          // Trigger your API delete logic here if available
-          alert("User " + id + " deleted successfully (Simulated)");
+          await TravelLoopAPI.admin.deleteUser(id);
+          showNotification('User deleted successfully.');
           loadAdminStats(); 
         } catch (error) {
-          console.error("Delete failed:", error);
+          showNotification(error.message, false);
         }
       }
     }
@@ -467,8 +467,8 @@ Traveloop Hackathon Project
               <div class="destination-left">
                 <img src="${item.image_url || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'}" alt="${item.location}">
                 <div class="destination-info">
-                  <h3>${item.location}</h3>
-                  <p>${item.country || item.location}</p>
+                  <h3>${escapeHtml(item.location)}</h3>
+                  <p>${escapeHtml(item.country || item.location)}</p>
                 </div>
               </div>
               <div class="trip-count">${(item.count || 0).toLocaleString()}</div>
