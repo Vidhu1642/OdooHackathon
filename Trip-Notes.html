@@ -48,7 +48,7 @@
 
  <div class="notes-layout">
     <div class="notes-sidebar">
-        <div class="search-box"><input type="text" placeholder="Search notes..."></div>
+        <div class="search-box"><input id="noteSearch" type="text" placeholder="Search notes..."></div>
         <div id="noteList"></div> </div>
 
     <div class="editor">
@@ -66,10 +66,15 @@
 <script src="backend/traveloop.js"></script>
 <script>
     let currentNoteId = null;
+    let notesCache = [];
 
     async function handleSave() {
-        const title = document.getElementById('noteTitle').value;
-        const body = document.getElementById('noteBody').value;
+        const title = document.getElementById('noteTitle').value.trim();
+        const body = document.getElementById('noteBody').value.trim();
+        if (!title) {
+            showNotification('Add a note title first.', false);
+            return;
+        }
         
         try {
             if (currentNoteId) {
@@ -78,27 +83,70 @@
                 const res = await TravelLoopAPI.notes.create({ title, body, trip_id: null }); //
                 currentNoteId = res.note_id;
             }
-            alert("Note Saved!");
-            location.reload(); 
-        } catch (err) { alert(err.message); }
+            showNotification('Note saved.');
+            await loadNotes();
+        } catch (err) {
+            showNotification(err.message, false);
+        }
     }
 
-    document.addEventListener('DOMContentLoaded', async () => {
+    async function loadNotes() {
         const res = await TravelLoopAPI.notes.list(); //
-        const list = document.getElementById('noteList');
-        list.innerHTML = res.notes.map(n => `
-            <div class="note-item" onclick="loadNote(${n.id}, '${n.title}', '${n.body}')">
-                <h3>${n.title}</h3>
-                <p>${n.body.substring(0, 30)}...</p>
-            </div>
-        `).join('');
-    });
-
-    function loadNote(id, title, body) {
-        currentNoteId = id;
-        document.getElementById('noteTitle').value = title;
-        document.getElementById('noteBody').value = body;
+        notesCache = res.notes || [];
+        renderNotes(notesCache);
     }
+
+    function renderNotes(notes) {
+        const list = document.getElementById('noteList');
+        list.innerHTML = notes.length ? notes.map(n => `
+            <div class="note-item" data-note-id="${n.id}">
+                <h3>${escapeHtml(n.title)}</h3>
+                <p>${escapeHtml((n.body || '').substring(0, 60))}${(n.body || '').length > 60 ? '...' : ''}</p>
+            </div>
+        `).join('') : '<p style="color:#6b7280;">No notes yet.</p>';
+    }
+
+    function loadNote(id) {
+        const note = notesCache.find(item => Number(item.id) === Number(id));
+        if (!note) return;
+        currentNoteId = id;
+        document.getElementById('noteTitle').value = note.title || '';
+        document.getElementById('noteBody').value = note.body || '';
+        document.querySelectorAll('.note-item').forEach(item => item.classList.toggle('active-note', Number(item.dataset.noteId) === Number(id)));
+    }
+
+    async function handleDelete() {
+        if (!currentNoteId) {
+            clearNote();
+            return;
+        }
+        if (!confirm('Delete this note?')) return;
+        try {
+            await TravelLoopAPI.notes.delete(currentNoteId);
+            showNotification('Note deleted.');
+            clearNote();
+            await loadNotes();
+        } catch (err) {
+            showNotification(err.message, false);
+        }
+    }
+
+    function clearNote() {
+        currentNoteId = null;
+        document.getElementById('noteTitle').value = '';
+        document.getElementById('noteBody').value = '';
+        document.querySelectorAll('.note-item').forEach(item => item.classList.remove('active-note'));
+    }
+
+    document.getElementById('noteList').addEventListener('click', event => {
+        const item = event.target.closest('.note-item');
+        if (item) loadNote(item.dataset.noteId);
+    });
+    document.getElementById('noteSearch').addEventListener('input', event => {
+        const query = event.target.value.trim().toLowerCase();
+        renderNotes(notesCache.filter(note => `${note.title || ''} ${note.body || ''}`.toLowerCase().includes(query)));
+    });
+    document.addEventListener('DOMContentLoaded', loadNotes);
 </script>
 
 

@@ -428,195 +428,9 @@ Connected with My Trips Screen
 
       <div class="left-panel">
 
-        <!-- CITY CARD -->
-
-        <div class="city-card">
-
-          <div class="city-header">
-
-            <h2>📍 Bali, Indonesia</h2>
-
-            <button>
-              Remove
-            </button>
-
-          </div>
-
-          <!-- DATES -->
-
-          <div class="date-row">
-
-            <div class="input-group">
-
-              <label>Arrival Date</label>
-
-              <input type="date">
-
-            </div>
-
-            <div class="input-group">
-
-              <label>Departure Date</label>
-
-              <input type="date">
-
-            </div>
-
-          </div>
-
-          <!-- ACTIVITIES -->
-
-          <div class="activity-section">
-
-            <div class="activity-title">
-
-              <h3>Activities</h3>
-
-              <button class="add-activity-btn"
-                onclick="addActivity()">
-
-                + Add Activity
-
-              </button>
-
-            </div>
-
-            <!-- ACTIVITY -->
-
-            <div class="activity-card">
-
-              <h4>🏖 Beach Exploration</h4>
-
-              <p>
-                Visit Kuta Beach and enjoy sunset views.
-              </p>
-
-              <div class="activity-info">
-
-                <span>
-                  ⏰ 3 Hours
-                </span>
-
-                <span class="activity-cost">
-                  $80
-                </span>
-
-              </div>
-
-            </div>
-
-            <!-- ACTIVITY -->
-
-            <div class="activity-card">
-
-              <h4>🍜 Food Tour</h4>
-
-              <p>
-                Experience authentic Indonesian cuisine.
-              </p>
-
-              <div class="activity-info">
-
-                <span>
-                  ⏰ 2 Hours
-                </span>
-
-                <span class="activity-cost">
-                  $50
-                </span>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        <!-- SECOND CITY -->
-
-        <div class="city-card">
-
-          <div class="city-header">
-
-            <h2>📍 Tokyo, Japan</h2>
-
-            <button>
-              Remove
-            </button>
-
-          </div>
-
-          <div class="date-row">
-
-            <div class="input-group">
-
-              <label>Arrival Date</label>
-
-              <input type="date">
-
-            </div>
-
-            <div class="input-group">
-
-              <label>Departure Date</label>
-
-              <input type="date">
-
-            </div>
-
-          </div>
-
-          <div class="activity-section">
-
-            <div class="activity-title">
-
-              <h3>Activities</h3>
-
-              <button class="add-activity-btn">
-                + Add Activity
-              </button>
-
-            </div>
-
-            <div class="activity-card">
-
-              <h4>🎌 Anime District Tour</h4>
-
-              <p>
-                Explore Akihabara and gaming centers.
-              </p>
-
-              <div class="activity-info">
-
-                <span>
-                  ⏰ 5 Hours
-                </span>
-
-                <span class="activity-cost">
-                  $120
-                </span>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        <!-- ADD STOP -->
-
-        <div class="add-stop"
-          onclick="addStop()">
-
-          <h2>+ Add New Stop</h2>
-
-          <p style="margin-top:10px;color:#6b7280;">
-            Add another city to your itinerary
-          </p>
-
-        </div>
+        <p style="text-align: center; color: #6b7280; margin-top: 50px;">
+          Select a trip from the dropdown above to load and edit its itinerary.
+        </p>
 
       </div>
 
@@ -624,91 +438,9 @@ Connected with My Trips Screen
 
       <div class="right-panel">
 
-        <!-- SUMMARY -->
-
-        <div class="summary-card">
-
-          <h2>Trip Summary</h2>
-
-          <div class="summary-item">
-
-            <span>Total Cities</span>
-
-            <strong>2</strong>
-
-          </div>
-
-          <div class="summary-item">
-
-            <span>Total Activities</span>
-
-            <strong>3</strong>
-
-          </div>
-
-          <div class="summary-item">
-
-            <span>Total Days</span>
-
-            <strong>12 Days</strong>
-
-          </div>
-
-          <div class="summary-item">
-
-            <span>Estimated Budget</span>
-
-            <strong>$2500</strong>
-
-          </div>
-
-          <div class="summary-total">
-
-            <span>Total Cost</span>
-
-            <span>$2500</span>
-
-          </div>
-
-        </div>
-
-        <!-- TIMELINE -->
-
-        <div class="timeline">
-
-          <h2>Travel Timeline</h2>
-
-          <div class="timeline-item">
-
-            <h4>Day 1 - Bali</h4>
-
-            <p>
-              Arrival and beach exploration
-            </p>
-
-          </div>
-
-          <div class="timeline-item">
-
-            <h4>Day 3 - Bali</h4>
-
-            <p>
-              Food tour and temple visits
-            </p>
-
-          </div>
-
-          <div class="timeline-item">
-
-            <h4>Day 6 - Tokyo</h4>
-
-            <p>
-              Anime district and shopping
-            </p>
-
-          </div>
-
-        </div>
+        <p style="text-align: center; color: #6b7280; margin-top: 50px;">
+          Trip summary and timeline will appear here when you select a trip.
+        </p>
 
       </div>
 
@@ -716,8 +448,149 @@ Connected with My Trips Screen
 
   </div>
 
+  </div>
+
+  <!-- JAVASCRIPT -->
+
   <script src="backend/traveloop.js"></script>
   <script>
+
+    async function initializePage() {
+      try {
+        const tripsResp = await TravelLoopAPI.trips.list();
+        const trips = tripsResp.trips || [];
+        const select = document.getElementById('tripSelect');
+        trips.forEach(trip => {
+          const option = document.createElement('option');
+          option.value = trip.id;
+          option.textContent = `${trip.name} - ${trip.destination}`;
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Error loading trips:', error);
+      }
+    }
+
+    async function loadItinerary() {
+      const tripId = document.getElementById('tripSelect').value;
+      if (!tripId) {
+        // Clear content
+        document.querySelector('.left-panel').innerHTML = '<p style="text-align: center; color: #6b7280; margin-top: 50px;">Select a trip from the dropdown above to load and edit its itinerary.</p>';
+        document.querySelector('.right-panel').innerHTML = '<p style="text-align: center; color: #6b7280; margin-top: 50px;">Trip summary and timeline will appear here when you select a trip.</p>';
+        return;
+      }
+
+      try {
+        const response = await TravelLoopAPI.itinerary.load(tripId);
+        const itinerary = response.itinerary;
+        if (itinerary && itinerary.stops) {
+          // Populate the left panel with city cards
+          const leftPanel = document.querySelector('.left-panel');
+          leftPanel.innerHTML = itinerary.stops.map(stop => `
+            <div class="city-card">
+              <div class="city-header">
+                <h2>📍 ${stop.city}</h2>
+                <button>Remove</button>
+              </div>
+              <div class="date-row">
+                <div class="input-group">
+                  <label>Arrival Date</label>
+                  <input type="date" value="${stop.arrival_date || ''}">
+                </div>
+                <div class="input-group">
+                  <label>Departure Date</label>
+                  <input type="date" value="${stop.departure_date || ''}">
+                </div>
+              </div>
+              <div class="activity-section">
+                <div class="activity-title">
+                  <h3>Activities</h3>
+                  <button class="add-activity-btn" onclick="addActivity()">+ Add Activity</button>
+                </div>
+                ${stop.activities.map(activity => `
+                  <div class="activity-card">
+                    <h4>${activity.title}</h4>
+                    <p>${activity.description}</p>
+                    <div class="activity-info">
+                      <span>⏰ ${activity.duration}</span>
+                      <span class="activity-cost">$${activity.cost}</span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `).join('');
+
+          // Calculate and populate the right panel with summary and timeline
+          const totalCities = itinerary.stops.length;
+          const totalActivities = itinerary.stops.reduce((sum, stop) => sum + stop.activities.length, 0);
+          const totalCost = itinerary.stops.reduce((sum, stop) => sum + stop.activities.reduce((actSum, act) => actSum + (act.cost || 0), 0), 0);
+
+          // Calculate total days (simplified - using first and last dates)
+          let totalDays = 'N/A';
+          if (itinerary.stops.length > 0) {
+            const startDate = new Date(itinerary.stops[0].arrival_date);
+            const endDate = new Date(itinerary.stops[itinerary.stops.length - 1].departure_date);
+            if (!isNaN(startDate) && !isNaN(endDate)) {
+              totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + ' Days';
+            }
+          }
+
+          // Generate timeline
+          const timelineItems = itinerary.stops.flatMap(stop =>
+            stop.activities.map(activity => ({
+              day: `Day ${Math.floor(Math.random() * 10) + 1} - ${stop.city}`, // Simplified day calculation
+              description: activity.title
+            }))
+          );
+
+          const rightPanel = document.querySelector('.right-panel');
+          rightPanel.innerHTML = `
+            <div class="summary-card">
+              <h2>Trip Summary</h2>
+              <div class="summary-item">
+                <span>Total Cities</span>
+                <strong>${totalCities}</strong>
+              </div>
+              <div class="summary-item">
+                <span>Total Activities</span>
+                <strong>${totalActivities}</strong>
+              </div>
+              <div class="summary-item">
+                <span>Total Days</span>
+                <strong>${totalDays}</strong>
+              </div>
+              <div class="summary-item">
+                <span>Estimated Budget</span>
+                <strong>$${totalCost}</strong>
+              </div>
+              <div class="summary-total">
+                <span>Total Cost</span>
+                <span>$${totalCost}</span>
+              </div>
+            </div>
+
+            <div class="timeline">
+              <h2>Travel Timeline</h2>
+              ${timelineItems.slice(0, 5).map(item => `
+                <div class="timeline-item">
+                  <h4>${item.day}</h4>
+                  <p>${item.description}</p>
+                </div>
+              `).join('')}
+            </div>
+          `;
+
+          showNotification('Itinerary loaded successfully.');
+        } else {
+          document.querySelector('.left-panel').innerHTML = '<p style="text-align: center; color: #6b7280; margin-top: 50px;">No itinerary found for this trip. Start building one!</p>';
+          document.querySelector('.right-panel').innerHTML = '<p style="text-align: center; color: #6b7280; margin-top: 50px;">Trip summary and timeline will appear here when you select a trip.</p>';
+        }
+      } catch (error) {
+        console.error('Error loading itinerary:', error);
+        showNotification('Failed to load itinerary', false);
+      }
+    }
 
     async function initializePage() {
       try {
@@ -807,9 +680,179 @@ Connected with My Trips Screen
       showNotification('Add Activity Feature Clicked!');
     }
 
-    document.addEventListener('DOMContentLoaded', initializePage);
+    // Dynamic initializer below owns page setup.
 
   </script>
 
+  <script>
+    let dynamicSelectedTrip = null;
+
+    async function initializeDynamicItinerary() {
+      try {
+        const select = document.getElementById('tripSelect');
+        const tripsResp = await TravelLoopAPI.trips.list();
+        const trips = tripsResp.trips || [];
+        select.innerHTML = '<option value="">Select Trip</option>';
+        trips.forEach(trip => {
+          const option = document.createElement('option');
+          option.value = trip.id;
+          option.textContent = `${trip.name} - ${trip.destination || 'Destination not set'}`;
+          select.appendChild(option);
+        });
+        if (getParam('trip_id')) {
+          select.value = getParam('trip_id');
+        }
+        await loadItinerary();
+      } catch (error) {
+        showNotification(error.message, false);
+      }
+    }
+
+    async function loadItinerary() {
+      const tripId = document.getElementById('tripSelect').value;
+      if (!tripId) {
+        dynamicSelectedTrip = null;
+        renderStops([]);
+        return;
+      }
+      try {
+        const tripResp = await TravelLoopAPI.trips.get(tripId);
+        dynamicSelectedTrip = tripResp.trip;
+        const response = await TravelLoopAPI.itinerary.loadByTrip(tripId);
+        renderStops(response.stops || []);
+        if (!response.itinerary) {
+          addStop(dynamicSelectedTrip?.destination || '');
+        }
+      } catch (error) {
+        renderStops([]);
+        showNotification(error.message, false);
+      }
+    }
+
+    function stopTemplate(stop = {}) {
+      const activities = Array.isArray(stop.activities) ? stop.activities : [];
+      return `
+        <div class="city-card">
+          <div class="city-header">
+            <input class="city-name" placeholder="City name" value="${escapeHtml(stop.city || '')}" style="font-size:24px;font-weight:bold;border:1px solid #d1d5db;border-radius:10px;padding:10px;width:70%;">
+            <button type="button" onclick="removeStop(this)">Remove</button>
+          </div>
+          <div class="date-row">
+            <div class="input-group"><label>Arrival Date</label><input class="arrival-date" type="date" value="${escapeHtml(stop.arrival_date || '')}"></div>
+            <div class="input-group"><label>Departure Date</label><input class="departure-date" type="date" value="${escapeHtml(stop.departure_date || '')}"></div>
+          </div>
+          <div class="activity-section">
+            <div class="activity-title"><h3>Activities</h3><button type="button" class="add-activity-btn" onclick="addActivity(this)">+ Add Activity</button></div>
+            <div class="activities">${activities.map(activityTemplate).join('')}</div>
+          </div>
+        </div>`;
+    }
+
+    function activityTemplate(activity = {}) {
+      return `
+        <div class="activity-card">
+          <input class="activity-title-input" placeholder="Activity title" value="${escapeHtml(activity.title || activity.name || '')}" style="width:100%;margin-bottom:8px;padding:10px;border:1px solid #bfdbfe;border-radius:10px;font-weight:bold;color:#2563eb;">
+          <textarea class="activity-description" placeholder="Description" style="width:100%;min-height:70px;margin-bottom:10px;padding:10px;border:1px solid #bfdbfe;border-radius:10px;">${escapeHtml(activity.description || '')}</textarea>
+          <div class="activity-info">
+            <input class="activity-duration" placeholder="Duration" value="${escapeHtml(activity.duration || '')}" style="width:42%;padding:10px;border:1px solid #bfdbfe;border-radius:10px;">
+            <input class="activity-cost-input" type="number" min="0" step="1" placeholder="Cost" value="${Number(activity.cost || 0)}" style="width:32%;padding:10px;border:1px solid #bfdbfe;border-radius:10px;">
+            <button type="button" onclick="removeActivity(this)" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:9px 12px;">Delete</button>
+          </div>
+        </div>`;
+    }
+
+    function renderStops(stops) {
+      const leftPanel = document.querySelector('.left-panel');
+      leftPanel.innerHTML = stops.length ? stops.map(stopTemplate).join('') : '';
+      leftPanel.insertAdjacentHTML('beforeend', '<div class="add-stop" onclick="addStop()"><h2>+ Add Stop</h2></div>');
+      renderSummary();
+    }
+
+    function collectStops() {
+      return Array.from(document.querySelectorAll('.city-card')).map(card => ({
+        city: card.querySelector('.city-name').value.trim(),
+        arrival_date: card.querySelector('.arrival-date').value || null,
+        departure_date: card.querySelector('.departure-date').value || null,
+        activities: Array.from(card.querySelectorAll('.activity-card')).map(activity => ({
+          title: activity.querySelector('.activity-title-input').value.trim(),
+          description: activity.querySelector('.activity-description').value.trim(),
+          duration: activity.querySelector('.activity-duration').value.trim(),
+          cost: Number(activity.querySelector('.activity-cost-input').value || 0)
+        })).filter(activity => activity.title)
+      })).filter(stop => stop.city);
+    }
+
+    function renderSummary() {
+      const stops = collectStops();
+      const totalActivities = stops.reduce((sum, stop) => sum + stop.activities.length, 0);
+      const totalCost = stops.reduce((sum, stop) => sum + stop.activities.reduce((actSum, act) => actSum + Number(act.cost || 0), 0), 0);
+      const totalDays = stops.reduce((sum, stop) => sum + daysBetween(stop.arrival_date, stop.departure_date), 0);
+      document.querySelector('.right-panel').innerHTML = `
+        <div class="summary-card">
+          <h2>Trip Summary</h2>
+          <div class="summary-item"><span>Total Cities</span><strong>${stops.length}</strong></div>
+          <div class="summary-item"><span>Total Activities</span><strong>${totalActivities}</strong></div>
+          <div class="summary-item"><span>Total Days</span><strong>${totalDays || 'N/A'}</strong></div>
+          <div class="summary-item"><span>Trip Budget</span><strong>${formatMoney(dynamicSelectedTrip?.budget || 0)}</strong></div>
+          <div class="summary-total"><span>Activity Cost</span><span>${formatMoney(totalCost)}</span></div>
+        </div>
+        <div class="timeline">
+          <h2>Travel Timeline</h2>
+          ${stops.map((stop, index) => `<div class="timeline-item"><h4>Stop ${index + 1} - ${escapeHtml(stop.city)}</h4><p>${formatDate(stop.arrival_date)} to ${formatDate(stop.departure_date)} - ${stop.activities.length} activities</p></div>`).join('') || '<p style="color:#6b7280;">Add stops to build your timeline.</p>'}
+        </div>`;
+    }
+
+    function addStop(city = '') {
+      document.querySelector('.add-stop').insertAdjacentHTML('beforebegin', stopTemplate({ city, activities: [] }));
+      renderSummary();
+    }
+
+    function removeStop(button) {
+      button.closest('.city-card').remove();
+      renderSummary();
+    }
+
+    function addActivity(button) {
+      button.closest('.city-card').querySelector('.activities').insertAdjacentHTML('beforeend', activityTemplate());
+      renderSummary();
+    }
+
+    function removeActivity(button) {
+      button.closest('.activity-card').remove();
+      renderSummary();
+    }
+
+    async function saveItinerary(){
+      const tripId = document.getElementById('tripSelect').value;
+      if (!tripId) {
+        showNotification('Select a trip first', false);
+        return;
+      }
+      const stops = collectStops();
+      if (!stops.length) {
+        showNotification('Add at least one city stop.', false);
+        return;
+      }
+      try {
+        await TravelLoopAPI.itinerary.save({
+          trip_id: tripId,
+          title: dynamicSelectedTrip?.name || 'My Travel Itinerary',
+          summary: dynamicSelectedTrip?.description || 'Saved itinerary from the planner.',
+          stops
+        });
+        showNotification('Itinerary saved successfully.');
+      } catch (error) {
+        showNotification(error.message, false);
+      }
+    }
+
+    document.addEventListener('input', event => {
+      if (event.target.closest('.left-panel')) {
+        renderSummary();
+      }
+    });
+    document.addEventListener('DOMContentLoaded', initializeDynamicItinerary);
+  </script>
 </body>
 </html>
+

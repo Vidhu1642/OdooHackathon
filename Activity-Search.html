@@ -340,9 +340,11 @@ Connected with City Search
 
   <script src="backend/traveloop.js"></script>
   <script>
+    const activityPlanningList = JSON.parse(localStorage.getItem('traveloopActivities') || '[]');
+
     async function searchActivity() {
       const query = document.getElementById('activitySearchQuery').value.trim();
-      if (!query) return alert('Please enter an activity name');
+      if (!query) return showNotification('Please enter an activity name', false);
 
       try {
         const response = await TravelLoopAPI.search.query(query); //
@@ -360,25 +362,37 @@ Connected with City Search
           card.innerHTML = `
             <div class="activity-image">
               <img src="https://images.unsplash.com/photo-1519817650390-64a93db511aa">
-              <div class="activity-type">${activity.category}</div>
+              <div class="activity-type">${escapeHtml(activity.category || 'Activity')}</div>
             </div>
             <div class="activity-content">
-              <h2>${activity.name}</h2>
-              <p>${activity.description}</p>
+              <h2>${escapeHtml(activity.name)}</h2>
+              <p>${escapeHtml(activity.description || 'No description available.')}</p>
               <div class="activity-info">
-                <div class="info-box"><h4>Cost</h4><span>$${activity.cost}</span></div>
-                <div class="info-box"><h4>Location</h4><span>${activity.location}</span></div>
+                <div class="info-box"><h4>Cost</h4><span>${formatMoney(activity.cost)}</span></div>
+                <div class="info-box"><h4>Location</h4><span>${escapeHtml(activity.location || 'Not set')}</span></div>
               </div>
-              <button class="add-btn" onclick="addActivity('${activity.name}')">Add Activity</button>
+              <button class="add-btn" data-activity="${escapeHtml(activity.name)}" data-description="${escapeHtml(activity.description || '')}" data-cost="${Number(activity.cost || 0)}">Add Activity</button>
             </div>`;
           grid.appendChild(card);
         });
-      } catch (e) { console.error(e); }
+      } catch (e) {
+        showNotification(e.message, false);
+      }
     }
 
-    function addActivity(name) {
-      alert(name + " added to your planning list!");
+    function addActivity(name, description = '', cost = 0) {
+      activityPlanningList.push({ name, description, cost, added_at: new Date().toISOString() });
+      localStorage.setItem('traveloopActivities', JSON.stringify(activityPlanningList));
+      showNotification(`${name} added to your planning list.`);
     }
+
+    document.getElementById('activityResults').addEventListener('click', event => {
+      const button = event.target.closest('.add-btn[data-activity]');
+      if (button) addActivity(button.dataset.activity, button.dataset.description, Number(button.dataset.cost || 0));
+    });
+    document.getElementById('activitySearchQuery').addEventListener('keydown', event => {
+      if (event.key === 'Enter') searchActivity();
+    });
   </script>
 </body>
 </html>

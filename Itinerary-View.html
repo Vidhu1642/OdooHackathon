@@ -453,7 +453,7 @@ Connected with Itinerary Builder
 
             <h3>Activities</h3>
 
-            <span>8 Activities</span>
+            <span id="itineraryActivities">0 Activities</span>
 
           </div>
 
@@ -461,7 +461,7 @@ Connected with Itinerary Builder
 
             <h3>Budget</h3>
 
-            <span>$2500</span>
+            <span id="itineraryBudget">$0</span>
 
           </div>
 
@@ -611,9 +611,106 @@ Connected with Itinerary Builder
       showNotification('Downloading itinerary PDF...');
     }
 
-    document.addEventListener('DOMContentLoaded', initializeItineraryPage);
+    // Dynamic initializer below owns page setup.
 
   </script>
 
+  <script>
+    let dynamicCurrentItinerary = null;
+    let dynamicCurrentTrip = null;
+
+    async function initializeDynamicItineraryView(){
+      try {
+        const tripsResp = await TravelLoopAPI.trips.list();
+        const trips = tripsResp.trips || [];
+        const tripSelect = document.getElementById('itineraryTripSelect');
+        tripSelect.innerHTML = '<option value="">Select itinerary</option>';
+        trips.forEach(trip => {
+          const option = document.createElement('option');
+          option.value = trip.id;
+          option.textContent = `${trip.name} (${trip.destination || 'Destination not set'})`;
+          tripSelect.appendChild(option);
+        });
+        if (getParam('trip_id')) {
+          tripSelect.value = getParam('trip_id');
+        } else if (trips.length > 0) {
+          tripSelect.value = trips[0].id;
+        }
+        await loadItinerary();
+      } catch (error) {
+        showNotification(error.message, false);
+      }
+    }
+
+    async function loadItinerary(){
+      const tripId = document.getElementById('itineraryTripSelect').value;
+      if (!tripId) {
+        return;
+      }
+      try {
+        const tripResp = await TravelLoopAPI.trips.get(tripId);
+        dynamicCurrentTrip = tripResp.trip;
+        const response = await TravelLoopAPI.itinerary.loadByTrip(tripId);
+        dynamicCurrentItinerary = response.itinerary;
+        const stops = response.stops || [];
+
+        document.getElementById('itineraryTitle').textContent = dynamicCurrentTrip?.name || dynamicCurrentItinerary?.title || 'Trip Itinerary';
+        document.getElementById('itineraryDescription').textContent = dynamicCurrentTrip?.description || dynamicCurrentItinerary?.summary || 'No itinerary details added yet.';
+        document.getElementById('itineraryImage').src = dynamicCurrentTrip?.cover_photo || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e';
+
+        const totalDays = stops.reduce((sum, stop) => sum + daysBetween(stop.arrival_date, stop.departure_date), 0);
+        const totalActivities = stops.reduce((sum, stop) => sum + ((stop.activities || []).length), 0);
+        const totalCost = stops.reduce((sum, stop) => sum + (stop.activities || []).reduce((activitySum, activity) => activitySum + Number(activity.cost || 0), 0), 0);
+        document.getElementById('itineraryCities').textContent = `${stops.length} Stops`;
+        document.getElementById('itineraryDays').textContent = `${totalDays || 0} Days`;
+        document.getElementById('itineraryActivities').textContent = `${totalActivities} Activities`;
+        document.getElementById('itineraryBudget').textContent = formatMoney(dynamicCurrentTrip?.budget || totalCost);
+
+        const timeline = document.getElementById('itineraryTimeline');
+        if (!stops.length) {
+          timeline.innerHTML = '<div style="padding:40px;text-align:center;color:#6b7280;background:white;border-radius:20px;">No itinerary saved yet. Build one from the itinerary builder.</div>';
+          return;
+        }
+
+        timeline.innerHTML = stops.map((stop, idx) => `
+          <div class="timeline-card">
+            <div class="timeline-header">
+              <h2>Stop ${idx + 1} - ${escapeHtml(stop.city)}</h2>
+              <span>${formatDate(stop.arrival_date)}</span>
+            </div>
+            ${(stop.activities || []).map(activity => `
+              <div class="activity">
+                <h3>${escapeHtml(activity.title || activity.name || 'Activity')}</h3>
+                <p>${escapeHtml(activity.description || 'No description')}</p>
+                <div class="activity-info">
+                  <span>${escapeHtml(activity.duration || 'Duration not set')}</span>
+                  <span class="cost">${formatMoney(activity.cost)}</span>
+                </div>
+              </div>
+            `).join('') || '<p style="color:#6b7280;">No activities added for this stop.</p>'}
+          </div>
+        `).join('');
+      } catch (error) {
+        document.getElementById('itineraryTimeline').innerHTML = '<div style="padding:40px;text-align:center;color:#6b7280;background:white;border-radius:20px;">Unable to load itinerary.</div>';
+        showNotification(error.message, false);
+      }
+    }
+
+    function shareTrip(){
+      if (!dynamicCurrentItinerary?.public_token) {
+        showNotification('Save an itinerary before sharing.', false);
+        return;
+      }
+      const url = `${location.origin}${location.pathname.replace('Itinerary-View.html', 'Public-Itinerary-View.html')}?token=${dynamicCurrentItinerary.public_token}`;
+      navigator.clipboard?.writeText(url);
+      showNotification('Share link copied.');
+    }
+
+    function downloadPDF(){
+      window.print();
+    }
+
+    document.addEventListener('DOMContentLoaded', initializeDynamicItineraryView);
+  </script>
 </body>
 </html>

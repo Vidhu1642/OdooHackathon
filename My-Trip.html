@@ -343,28 +343,35 @@ Connected with Create Trip Screen
         grid.innerHTML = res.trips.map(trip => `
           <div class="trip-card">
             <div class="trip-image">
-              <img src="${trip.cover_photo || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'}" />
-              <div class="trip-status">${trip.status}</div>
+              <img src="${escapeHtml(trip.cover_photo || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e')}" />
+              <div class="trip-status">${escapeHtml(trip.status || 'Upcoming')}</div>
             </div>
             <div class="trip-content">
-              <h2>${trip.name}</h2>
+              <h2>${escapeHtml(trip.name)}</h2>
+              <p>${escapeHtml(trip.description || 'No description added yet.')}</p>
               <div class="trip-info">
-                <div class="info-box"><h4>Budget</h4><span>$${trip.budget}</span></div>
-                <div class="info-box"><h4>Destination</h4><span>${trip.destination}</span></div>
+                <div class="info-box"><h4>Budget</h4><span>${formatMoney(trip.budget)}</span></div>
+                <div class="info-box"><h4>Destination</h4><span>${escapeHtml(trip.destination || 'Not set')}</span></div>
+                <div class="info-box"><h4>Dates</h4><span>${formatDate(trip.start_date)}</span></div>
+                <div class="info-box"><h4>Travelers</h4><span>${Number(trip.travelers || 1)}</span></div>
               </div>
               <div class="btn-group">
                 <button class="btn view-btn" onclick="location.href='Itinerary-View.html?trip_id=${trip.id}'">View</button>
+                <button class="btn edit-btn" onclick="location.href='Itinerary.html?trip_id=${trip.id}'">Itinerary</button>
                 <button class="btn delete-btn" onclick="deleteTrip(${trip.id})">Delete</button>
               </div>
             </div>
           </div>
         `).join(''); //
-      } catch (err) { alert(err.message); }
+      } catch (err) {
+        showNotification(err.message, false);
+      }
     }
 
     async function deleteTrip(id) {
       if (confirm('Delete this trip permanently?')) {
         await TravelLoopAPI.trips.delete(id); //
+        showNotification('Trip deleted.');
         loadTrips();
       }
     }

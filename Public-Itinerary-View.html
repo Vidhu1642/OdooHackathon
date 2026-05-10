@@ -667,24 +667,97 @@ Connected with Packing Checklist
 
   <!-- JAVASCRIPT -->
 
+  <script src="backend/traveloop.js"></script>
   <script>
+    let sharedItinerary = null;
+    let sharedStops = [];
 
-    function copyTrip(){
+    async function loadSharedItinerary() {
+      const token = getParam('token');
+      if (!token) {
+        document.querySelector('.hero-content h1').textContent = 'Shared itinerary not found';
+        document.querySelector('.hero-content p').textContent = 'Open this page from a Traveloop share link.';
+        document.querySelector('.timeline').innerHTML = '<div class="timeline-card">No public token was provided.</div>';
+        return;
+      }
 
-      alert(
-        "Trip copied to your account!"
-      );
+      try {
+        const response = await TravelLoopAPI.itinerary.share(token);
+        sharedItinerary = response.itinerary;
+        sharedStops = response.stops || [];
+        const totalActivities = sharedStops.reduce((sum, stop) => sum + ((stop.activities || []).length), 0);
+        const totalDays = sharedStops.reduce((sum, stop) => sum + daysBetween(stop.arrival_date, stop.departure_date), 0);
+        const totalCost = sharedStops.reduce((sum, stop) => sum + (stop.activities || []).reduce((activitySum, activity) => activitySum + Number(activity.cost || 0), 0), 0);
 
+        document.querySelector('.hero-content h1').textContent = sharedItinerary.title || 'Shared Trip';
+        document.querySelector('.hero-content p').textContent = sharedItinerary.summary || 'A shared itinerary created with Traveloop.';
+        document.querySelector('.summary > p').textContent = sharedItinerary.summary || 'Explore the complete travel schedule, destinations, activities, and estimated budget for this trip.';
+
+        const statValues = document.querySelectorAll('.summary-card h2');
+        statValues[0].textContent = totalDays || 0;
+        statValues[1].textContent = sharedStops.length;
+        statValues[2].textContent = totalActivities;
+        statValues[3].textContent = formatMoney(totalCost);
+
+        document.querySelector('.timeline').innerHTML = sharedStops.length ? sharedStops.map((stop, index) => `
+          <div class="timeline-card">
+            <div class="timeline-header">
+              <h2>Stop ${index + 1} - ${escapeHtml(stop.city)}</h2>
+              <div class="date">${formatDate(stop.arrival_date)}</div>
+            </div>
+            ${(stop.activities || []).map(activity => `
+              <div class="activity">
+                <h3>${escapeHtml(activity.title || 'Activity')}</h3>
+                <p>${escapeHtml(activity.description || 'No description')}</p>
+                <div class="activity-footer">
+                  <span>${escapeHtml(activity.duration || 'Duration not set')}</span>
+                  <span class="price">${formatMoney(activity.cost)}</span>
+                </div>
+              </div>
+            `).join('') || '<p style="color:#6b7280;">No activities added for this stop.</p>'}
+          </div>
+        `).join('') : '<div class="timeline-card">This shared itinerary has no stops yet.</div>';
+      } catch (error) {
+        document.querySelector('.timeline').innerHTML = `<div class="timeline-card">${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    async function copyTrip(){
+      if (!sharedItinerary || !sharedStops.length) {
+        showNotification('Nothing to copy yet.', false);
+        return;
+      }
+      try {
+        const title = `${sharedItinerary.title || 'Copied Trip'} Copy`;
+        const created = await TravelLoopAPI.trips.create({
+          name: title,
+          destination: sharedStops.map(stop => stop.city).filter(Boolean).join(', '),
+          start_date: sharedStops[0]?.arrival_date || null,
+          end_date: sharedStops[sharedStops.length - 1]?.departure_date || null,
+          travelers: 1,
+          budget: sharedStops.reduce((sum, stop) => sum + (stop.activities || []).reduce((activitySum, activity) => activitySum + Number(activity.cost || 0), 0), 0),
+          description: sharedItinerary.summary || '',
+          cover_photo: '',
+          status: 'Planning'
+        });
+        await TravelLoopAPI.itinerary.save({
+          trip_id: created.trip_id,
+          title,
+          summary: sharedItinerary.summary || '',
+          stops: sharedStops
+        });
+        showNotification('Trip copied to your account.');
+      } catch (error) {
+        showNotification(error.message, false);
+      }
     }
 
     function shareTrip(){
-
-      alert(
-        "Public itinerary link shared!"
-      );
-
+      navigator.clipboard?.writeText(location.href);
+      showNotification('Public link copied.');
     }
 
+    document.addEventListener('DOMContentLoaded', loadSharedItinerary);
   </script>
   
 </div>

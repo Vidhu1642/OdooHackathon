@@ -344,7 +344,7 @@ Traveloop Project
 
       <div class="profile">
 
-        <button class="trip-btn">
+        <button class="trip-btn" onclick="location.href='Create-Trip.html'">
           + Plan New Trip
         </button>
 
@@ -367,7 +367,7 @@ Traveloop Project
 
         <p>Trips created so far</p>
 
-        <div class="number">12</div>
+        <div class="number" id="totalTrips">0</div>
 
       </div>
 
@@ -377,7 +377,7 @@ Traveloop Project
 
         <p>Explore the world</p>
 
-        <div class="number">8</div>
+        <div class="number" id="countriesVisited">0</div>
 
       </div>
 
@@ -387,7 +387,7 @@ Traveloop Project
 
         <p>Overall travel expenses</p>
 
-        <div class="number">$7.5K</div>
+        <div class="number" id="totalBudget">$0</div>
 
       </div>
 
@@ -397,7 +397,7 @@ Traveloop Project
 
         <p>Scheduled adventures</p>
 
-        <div class="number">3</div>
+        <div class="number" id="upcomingTrips">0</div>
 
       </div>
 
@@ -409,7 +409,7 @@ Traveloop Project
       Recent Trips
     </h2>
 
-    <div class="trip-grid">
+    <div class="trip-grid" id="recentTrips">
 
       <!-- CARD 1 -->
 
@@ -575,47 +575,45 @@ Traveloop Project
   <script src="backend/traveloop.js"></script>
   <script>
     async function loadDashboard() {
+      const recentTrips = document.getElementById('recentTrips');
+      recentTrips.innerHTML = '<p style="color:#6b7280;">Loading trips...</p>';
       try {
-        // Load trips
-        const tripsResp = await TravelLoopAPI.trips.list();
-        const trips = tripsResp.trips || [];
+        const response = await TravelLoopAPI.trips.list();
+        const trips = response.trips || [];
+        const destinations = new Set(trips.map(trip => (trip.destination || '').trim().toLowerCase()).filter(Boolean));
+        const totalBudget = trips.reduce((sum, trip) => sum + Number(trip.budget || 0), 0);
+        const upcoming = trips.filter(trip => (trip.status || '').toLowerCase() !== 'completed').length;
 
-        // Calculate stats
-        const totalTrips = trips.length;
-        const countries = new Set(trips.map(t => t.destination)).size;
-        const today = new Date().toISOString().split('T')[0];
-        const upcoming = trips.filter(t => t.start_date > today).length;
+        document.getElementById('totalTrips').textContent = trips.length;
+        document.getElementById('countriesVisited').textContent = destinations.size;
+        document.getElementById('totalBudget').textContent = formatMoney(totalBudget);
+        document.getElementById('upcomingTrips').textContent = upcoming;
 
-        // Update stats
-        document.querySelector('.stats .card:nth-child(1) .number').textContent = totalTrips;
-        document.querySelector('.stats .card:nth-child(2) .number').textContent = countries;
-        document.querySelector('.stats .card:nth-child(4) .number').textContent = upcoming;
+        if (!trips.length) {
+          recentTrips.innerHTML = '<div class="card"><h2>No trips yet</h2><p>Create your first trip to populate the dashboard.</p></div>';
+          return;
+        }
 
-        // Load recent trips (last 3)
-        const recentTrips = trips.slice(-3).reverse();
-        const tripCards = document.querySelectorAll('.trip-card');
-        recentTrips.forEach((trip, index) => {
-          if (tripCards[index]) {
-            const card = tripCards[index];
-            card.querySelector('h3').textContent = trip.name;
-            card.querySelector('p').textContent = `${trip.destination} • ${Math.ceil((new Date(trip.end_date) - new Date(trip.start_date)) / (1000 * 60 * 60 * 24))} Days`;
-            // Budget not available, leave or add placeholder
-          }
-        });
-
-        // Load profile for welcome
-        const profileResp = await TravelLoopAPI.profile.load();
-        const user = profileResp.profile;
-        document.querySelector('.welcome h1').textContent = `Welcome back, ${user.name || 'Traveler'}!`;
-
+        recentTrips.innerHTML = trips.slice(0, 3).map(trip => `
+          <div class="trip-card">
+            <img src="${escapeHtml(trip.cover_photo || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e')}" alt="">
+            <div class="trip-content">
+              <h3>${escapeHtml(trip.name)}</h3>
+              <p>${daysBetween(trip.start_date, trip.end_date)} Days - ${escapeHtml(trip.destination || 'Destination not set')}</p>
+              <div class="trip-details">
+                <span class="budget">Budget: ${formatMoney(trip.budget)}</span>
+                <button class="view-btn" onclick="location.href='Itinerary-View.html?trip_id=${trip.id}'">View</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
       } catch (error) {
-        console.error('Error loading dashboard:', error);
-        showNotification('Failed to load dashboard data', false);
+        recentTrips.innerHTML = '<div class="card"><h2>Could not load dashboard</h2><p>Please log in and check the backend connection.</p></div>';
+        showNotification(error.message, false);
       }
     }
 
     document.addEventListener('DOMContentLoaded', loadDashboard);
   </script>
-
 </body>
 </html>
