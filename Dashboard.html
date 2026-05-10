@@ -572,5 +572,50 @@ Traveloop Project
 
   </div>
 
+  <script src="backend/traveloop.js"></script>
+  <script>
+    async function loadDashboard() {
+      try {
+        // Load trips
+        const tripsResp = await TravelLoopAPI.trips.list();
+        const trips = tripsResp.trips || [];
+
+        // Calculate stats
+        const totalTrips = trips.length;
+        const countries = new Set(trips.map(t => t.destination)).size;
+        const today = new Date().toISOString().split('T')[0];
+        const upcoming = trips.filter(t => t.start_date > today).length;
+
+        // Update stats
+        document.querySelector('.stats .card:nth-child(1) .number').textContent = totalTrips;
+        document.querySelector('.stats .card:nth-child(2) .number').textContent = countries;
+        document.querySelector('.stats .card:nth-child(4) .number').textContent = upcoming;
+
+        // Load recent trips (last 3)
+        const recentTrips = trips.slice(-3).reverse();
+        const tripCards = document.querySelectorAll('.trip-card');
+        recentTrips.forEach((trip, index) => {
+          if (tripCards[index]) {
+            const card = tripCards[index];
+            card.querySelector('h3').textContent = trip.name;
+            card.querySelector('p').textContent = `${trip.destination} • ${Math.ceil((new Date(trip.end_date) - new Date(trip.start_date)) / (1000 * 60 * 60 * 24))} Days`;
+            // Budget not available, leave or add placeholder
+          }
+        });
+
+        // Load profile for welcome
+        const profileResp = await TravelLoopAPI.profile.load();
+        const user = profileResp.profile;
+        document.querySelector('.welcome h1').textContent = `Welcome back, ${user.name || 'Traveler'}!`;
+
+      } catch (error) {
+        console.error('Error loading dashboard:', error);
+        showNotification('Failed to load dashboard data', false);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadDashboard);
+  </script>
+
 </body>
 </html>

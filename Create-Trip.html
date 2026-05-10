@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>My Trips - Traveloop</title>
+<title>Create Trip - Traveloop</title>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
@@ -34,64 +34,36 @@ body{background:#f3f4f6;display:flex;}
   cursor:pointer;
 }
 
-/* GRID */
-.trip-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:20px;
+.form-container {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  max-width: 600px;
 }
 
-.trip-card{
-  background:#fff;
-  border-radius:15px;
-  overflow:hidden;
-  box-shadow:0 4px 10px rgba(0,0,0,0.08);
+.input-group {
+  margin-bottom: 20px;
 }
 
-.trip-card img{
-  width:100%;
-  height:180px;
-  object-fit:cover;
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
 }
 
-.trip-content{
-  padding:15px;
+.input-group input,
+.input-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
 }
 
-.trip-content h3{
-  margin-bottom:10px;
-}
-
-.trip-content p{
-  color:#6b7280;
-  margin-bottom:10px;
-}
-
-.budget{
-  color:green;
-  font-weight:bold;
-}
-
-.actions{
-  margin-top:10px;
-  display:flex;
-  gap:10px;
-}
-
-.delete-btn{
-  background:red;
-  color:#fff;
-  border:none;
-  padding:8px 12px;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-.empty{
-  text-align:center;
-  margin-top:50px;
-  font-size:18px;
-  color:#6b7280;
+.input-group textarea {
+  height: 100px;
+  resize: vertical;
 }
 </style>
 </head>
@@ -112,42 +84,68 @@ body{background:#f3f4f6;display:flex;}
 <div class="main">
 
   <div class="topbar">
-    <h1>My Trips 🧳</h1>
-    <button class="trip-btn" onclick="window.location.href='Create-Trip.html'">
-      + New Trip
-    </button>
+    <h1>Create New Trip ✈</h1>
   </div>
 
-  <div class="trip-grid" id="tripContainer"></div>
+  <div class="form-container">
+    <div class="input-group">
+      <label for="tripName">Trip Name</label>
+      <input type="text" id="tripName" placeholder="e.g. Summer Vacation 2024">
+    </div>
+    <div class="input-group">
+      <label for="destination">Destination</label>
+      <input type="text" id="destination" placeholder="e.g. Paris, France">
+    </div>
+    <div class="input-group">
+      <label for="startDate">Start Date</label>
+      <input type="date" id="startDate">
+    </div>
+    <div class="input-group">
+      <label for="endDate">End Date</label>
+      <input type="date" id="endDate">
+    </div>
+    <div class="input-group">
+      <label for="description">Description (Optional)</label>
+      <textarea id="description" placeholder="Tell us about your trip..."></textarea>
+    </div>
+    <button class="trip-btn" onclick="createTrip()">Create Trip</button>
+  </div>
 
 </div>
 
+<script src="backend/traveloop.js"></script>
 <script>
-const BASE_URL = "http://localhost/Traveloop/backend";
+async function createTrip() {
+  const name = document.getElementById('tripName').value.trim();
+  const destination = document.getElementById('destination').value.trim();
+  const start_date = document.getElementById('startDate').value;
+  const end_date = document.getElementById('endDate').value;
+  const description = document.getElementById('description').value.trim();
 
-// 🚀 LOAD TRIPS
-async function loadTrips() {
+  if (!name || !destination || !start_date || !end_date) {
+    showNotification('Please fill in all required fields', false);
+    return;
+  }
+
   try {
-
-    const res = await fetch(BASE_URL + "/trips.php?action=list", {
-      method: "GET",
-      credentials: "include"
+    await TravelLoopAPI.trips.create({
+      name,
+      destination,
+      start_date,
+      end_date,
+      description
     });
+    showNotification('Trip created successfully!');
+    // Redirect to My Trips
+    window.location.href = 'My-Trip.html';
+  } catch (error) {
+    showNotification(error.message, false);
+  }
+}
+</script>
 
-    const data = await res.json();
-
-    if (!data.success) {
-      alert(data.message);
-      return;
-    }
-
-    const trips = data.trips;
-    const container = document.getElementById("tripContainer");
-
-    container.innerHTML = "";
-
-    if (!trips || trips.length === 0) {
-      container.innerHTML = "<div class='empty'>No trips yet ✈</div>";
+</body>
+</html>
       return;
     }
 
