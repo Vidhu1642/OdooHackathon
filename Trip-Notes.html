@@ -1,0 +1,607 @@
+<!-- =========================================
+SCREEN 13 : TRIP NOTES / JOURNAL SCREEN
+Traveloop Hackathon Project
+Connected with User Profile
+========================================== -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trip Notes & Journal - Traveloop</title>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, Helvetica, sans-serif;
+    }
+
+    body{
+      background:#f3f4f6;
+      display:flex;
+    }
+
+    /* SIDEBAR */
+
+    .sidebar{
+      width:260px;
+      height:100vh;
+      background:#1e3a8a;
+      color:white;
+      padding:30px 20px;
+      position:fixed;
+      left:0;
+      top:0;
+      overflow-y:auto;
+    }
+
+    .sidebar::-webkit-scrollbar{
+      width:6px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb{
+      background:rgba(255,255,255,0.3);
+      border-radius:10px;
+    }
+
+    .logo{
+      font-size:32px;
+      font-weight:bold;
+      margin-bottom:40px;
+    }
+
+    .menu{
+      list-style:none;
+    }
+
+    .menu li{
+      margin:20px 0;
+    }
+
+    .menu a{
+      color:white;
+      text-decoration:none;
+      font-size:18px;
+      padding:12px;
+      display:block;
+      border-radius:10px;
+      transition:0.3s;
+    }
+
+    .menu a:hover{
+      background:rgba(255,255,255,0.2);
+    }
+
+    /* MAIN */
+
+    .main{
+      margin-left:260px;
+      width:calc(100% - 260px);
+      padding:40px;
+    }
+
+    /* TOPBAR */
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:40px;
+      flex-wrap:wrap;
+      gap:20px;
+    }
+
+    .topbar h1{
+      font-size:38px;
+      color:#111827;
+    }
+
+    .topbar p{
+      color:#6b7280;
+      margin-top:8px;
+    }
+
+    .new-note-btn{
+      background:#2563eb;
+      color:white;
+      border:none;
+      padding:15px 25px;
+      border-radius:12px;
+      font-size:16px;
+      font-weight:bold;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    .new-note-btn:hover{
+      background:#1d4ed8;
+    }
+
+    /* LAYOUT */
+
+    .notes-layout{
+      display:grid;
+      grid-template-columns:1fr 2fr;
+      gap:30px;
+    }
+
+    /* SIDEBAR NOTES */
+
+    .notes-sidebar{
+      background:white;
+      border-radius:25px;
+      padding:25px;
+      box-shadow:0 8px 20px rgba(0,0,0,0.08);
+      height:fit-content;
+    }
+
+    .search-box{
+      margin-bottom:25px;
+    }
+
+    .search-box input{
+      width:100%;
+      padding:15px;
+      border:1px solid #d1d5db;
+      border-radius:12px;
+      font-size:15px;
+    }
+
+    /* NOTE ITEM */
+
+    .note-item{
+      background:#f9fafb;
+      padding:18px;
+      border-radius:15px;
+      margin-bottom:15px;
+      cursor:pointer;
+      transition:0.3s;
+      border-left:5px solid transparent;
+    }
+
+    .note-item:hover{
+      background:#eff6ff;
+      border-left:5px solid #2563eb;
+    }
+
+    .active-note{
+      background:#dbeafe;
+      border-left:5px solid #2563eb;
+    }
+
+    .note-item h3{
+      margin-bottom:8px;
+      color:#111827;
+    }
+
+    .note-item p{
+      color:#6b7280;
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .note-date{
+      margin-top:10px;
+      font-size:13px;
+      color:#9ca3af;
+    }
+
+    /* NOTE EDITOR */
+
+    .editor{
+      background:white;
+      border-radius:25px;
+      padding:35px;
+      box-shadow:0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    .editor-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:25px;
+      flex-wrap:wrap;
+      gap:20px;
+    }
+
+    .editor-header input{
+      flex:1;
+      padding:16px;
+      border:1px solid #d1d5db;
+      border-radius:12px;
+      font-size:20px;
+      font-weight:bold;
+    }
+
+    .editor-actions{
+      display:flex;
+      gap:15px;
+    }
+
+    .btn{
+      border:none;
+      padding:14px 22px;
+      border-radius:12px;
+      font-size:15px;
+      font-weight:bold;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    .save-btn{
+      background:#059669;
+      color:white;
+    }
+
+    .delete-btn{
+      background:#ef4444;
+      color:white;
+    }
+
+    .btn:hover{
+      opacity:0.9;
+    }
+
+    /* TEXTAREA */
+
+    .editor textarea{
+      width:100%;
+      height:420px;
+      border:1px solid #d1d5db;
+      border-radius:15px;
+      padding:20px;
+      font-size:16px;
+      line-height:1.8;
+      resize:none;
+    }
+
+    /* FOOTER INFO */
+
+    .editor-footer{
+      margin-top:20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:15px;
+    }
+
+    .trip-tag{
+      background:#dbeafe;
+      color:#2563eb;
+      padding:10px 16px;
+      border-radius:20px;
+      font-weight:bold;
+    }
+
+    .timestamp{
+      color:#6b7280;
+      font-size:14px;
+    }
+
+    /* QUICK NOTES */
+
+    .quick-notes{
+      margin-top:35px;
+      background:#eff6ff;
+      padding:25px;
+      border-radius:20px;
+    }
+
+    .quick-notes h2{
+      margin-bottom:20px;
+      color:#111827;
+    }
+
+    .quick-tags{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+    }
+
+    .tag{
+      background:white;
+      color:#2563eb;
+      padding:10px 18px;
+      border-radius:20px;
+      font-weight:bold;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    .tag:hover{
+      background:#2563eb;
+      color:white;
+    }
+
+    /* RESPONSIVE */
+
+    @media(max-width:1000px){
+
+      .sidebar{
+        display:none;
+      }
+
+      .main{
+        margin-left:0;
+        width:100%;
+      }
+
+      .notes-layout{
+        grid-template-columns:1fr;
+      }
+
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+
+  <div class="sidebar">
+
+    <div class="logo">
+      Traveloop
+    </div>
+
+<ul class="menu">
+  <li><a href="Dashboard.html">🏠 Dashboard</a></li>
+  <li><a href="Create-Trip.html">✈ Create Trip</a></li>
+  <li><a href="My-Trip.html">🧳 My Trips</a></li>
+  <li><a href="Itinerary.html">📅 Build Itinerary</a></li>
+  <li><a href="Itinerary-View.html">🗺 Itinerary View</a></li>
+  <li><a href="Search.html">🌍 City Search</a></li>
+  <li><a href="Activity-Search.html">🎯 Activity Search</a></li>
+  <li><a href="Budget-Cost.html">💰 Budget Planner</a></li>
+  <li><a href="Packing.html">🎒 Packing Checklist</a></li>
+  <li><a href="Public-Itinerary-View.html">🌐 Community Trips</a></li>
+  <li><a href="Trip-Notes.html">📝 Trip Notes</a></li>
+  <li><a href="Profile.html">👤 Profile & Settings</a></li>
+  <li><a href="Admin-Dashboard.html">📊 Admin Analytics</a></li>
+  <li><a href="index.html">🚪 Logout</a></li>
+</ul>
+
+  </div>
+
+  <!-- MAIN -->
+
+  <div class="main">
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+      <div>
+
+        <h1>Trip Notes & Journal 📝</h1>
+
+        <p>
+          Save memories, reminders, and travel details
+        </p>
+
+      </div>
+
+      <button class="new-note-btn"
+        onclick="newNote()">
+
+        + New Note
+
+      </button>
+
+    </div>
+
+    <!-- LAYOUT -->
+
+    <div class="notes-layout">
+
+      <!-- LEFT SIDEBAR -->
+
+      <div class="notes-sidebar">
+
+        <!-- SEARCH -->
+
+        <div class="search-box">
+
+          <input 
+            type="text"
+            placeholder="Search notes..."
+          >
+
+        </div>
+
+        <!-- NOTE ITEMS -->
+
+        <div class="note-item active-note">
+
+          <h3>Hotel Check-In</h3>
+
+          <p>
+            Remember to carry passport and
+            booking confirmation.
+          </p>
+
+          <div class="note-date">
+            March 10, 2026
+          </div>
+
+        </div>
+
+        <div class="note-item">
+
+          <h3>Tokyo Food List</h3>
+
+          <p>
+            Try sushi, ramen, and local desserts
+            near Shibuya.
+          </p>
+
+          <div class="note-date">
+            March 12, 2026
+          </div>
+
+        </div>
+
+        <div class="note-item">
+
+          <h3>Flight Reminder</h3>
+
+          <p>
+            Reach airport 3 hours before departure.
+          </p>
+
+          <div class="note-date">
+            March 14, 2026
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- NOTE EDITOR -->
+
+      <div class="editor">
+
+        <div class="editor-header">
+
+          <input 
+            type="text"
+            value="Hotel Check-In"
+          >
+
+          <div class="editor-actions">
+
+            <button class="btn save-btn"
+              onclick="saveNote()">
+
+              Save
+
+            </button>
+
+            <button class="btn delete-btn"
+              onclick="deleteNote()">
+
+              Delete
+
+            </button>
+
+          </div>
+
+        </div>
+
+        <!-- NOTE CONTENT -->
+
+        <textarea>
+
+Hotel Name: Bali Paradise Resort
+
+Check-In Time: 2:00 PM
+
+Important:
+- Carry passport and booking confirmation.
+- Airport pickup already booked.
+- Contact hotel manager if arrival is delayed.
+
+Additional Reminder:
+Exchange currency before arriving at the airport.
+
+        </textarea>
+
+        <!-- FOOTER -->
+
+        <div class="editor-footer">
+
+          <div class="trip-tag">
+            Bali Adventure
+          </div>
+
+          <div class="timestamp">
+            Last Edited: March 10, 2026 • 8:45 PM
+          </div>
+
+        </div>
+
+        <!-- QUICK NOTES -->
+
+        <div class="quick-notes">
+
+          <h2>Quick Templates ⚡</h2>
+
+          <div class="quick-tags">
+
+            <div class="tag">
+              Hotel Reminder
+            </div>
+
+            <div class="tag">
+              Emergency Contact
+            </div>
+
+            <div class="tag">
+              Flight Details
+            </div>
+
+            <div class="tag">
+              Packing Reminder
+            </div>
+
+            <div class="tag">
+              Restaurant List
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT -->
+
+  <script>
+
+    function saveNote(){
+
+      alert(
+        "Note Saved Successfully!"
+      );
+
+    }
+
+    function deleteNote(){
+
+      const confirmDelete =
+      confirm(
+        "Are you sure you want to delete this note?"
+      );
+
+      if(confirmDelete){
+
+        alert(
+          "Note Deleted Successfully!"
+        );
+
+      }
+
+    }
+
+    function newNote(){
+
+      alert(
+        "Create a new travel note!"
+      );
+
+    }
+
+  </script>
+
+</body>
+</html>
