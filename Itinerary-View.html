@@ -391,6 +391,10 @@ Connected with Itinerary Builder
 
       <div class="top-buttons">
 
+        <select id="itineraryTripSelect" onchange="loadItinerary()" style="padding:10px;border-radius:8px;border:1px solid #d1d5db;">
+          <option value="">Select itinerary</option>
+        </select>
+
         <button class="btn share-btn"
           onclick="shareTrip()">
 
@@ -413,20 +417,16 @@ Connected with Itinerary Builder
 
     <div class="overview">
 
-      <img 
+      <img id="itineraryImage" 
         src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
       >
 
       <div class="overview-content">
 
-        <h2>Bali & Tokyo Adventure</h2>
+        <h2 id="itineraryTitle">Bali & Tokyo Adventure</h2>
 
-        <p>
-          Explore tropical beaches in Bali and
-          futuristic city life in Tokyo. This
-          itinerary combines relaxation,
-          adventure, food tours, shopping,
-          and cultural experiences.
+        <p id="itineraryDescription">
+          Select an itinerary to view details
         </p>
 
         <!-- STATS -->
@@ -437,7 +437,7 @@ Connected with Itinerary Builder
 
             <h3>Total Days</h3>
 
-            <span>12 Days</span>
+            <span id="itineraryDays">0 Days</span>
 
           </div>
 
@@ -445,7 +445,7 @@ Connected with Itinerary Builder
 
             <h3>Cities</h3>
 
-            <span>2 Stops</span>
+            <span id="itineraryCities">0 Stops</span>
 
           </div>
 
@@ -479,120 +479,8 @@ Connected with Itinerary Builder
         Travel Timeline
       </h2>
 
-      <div class="timeline">
-
-        <!-- DAY 1 -->
-
-        <div class="timeline-card">
-
-          <div class="timeline-header">
-
-            <h2>Day 1 - Bali</h2>
-
-            <span>March 12</span>
-
-          </div>
-
-          <div class="activity">
-
-            <h3>🏖 Beach Exploration</h3>
-
-            <p>
-              Visit Kuta Beach and enjoy
-              beautiful sunset views.
-            </p>
-
-            <div class="activity-info">
-
-              <span>⏰ 3 Hours</span>
-
-              <span class="cost">
-                $80
-              </span>
-
-            </div>
-
-          </div>
-
-          <div class="activity">
-
-            <h3>🍜 Food Tour</h3>
-
-            <p>
-              Explore authentic Indonesian
-              cuisine and street food.
-            </p>
-
-            <div class="activity-info">
-
-              <span>⏰ 2 Hours</span>
-
-              <span class="cost">
-                $50
-              </span>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        <!-- DAY 5 -->
-
-        <div class="timeline-card">
-
-          <div class="timeline-header">
-
-            <h2>Day 5 - Tokyo</h2>
-
-            <span>March 17</span>
-
-          </div>
-
-          <div class="activity">
-
-            <h3>🎌 Anime District Tour</h3>
-
-            <p>
-              Explore Akihabara and discover
-              gaming cafes and anime stores.
-            </p>
-
-            <div class="activity-info">
-
-              <span>⏰ 5 Hours</span>
-
-              <span class="cost">
-                $120
-              </span>
-
-            </div>
-
-          </div>
-
-          <div class="activity">
-
-            <h3>🍣 Sushi Experience</h3>
-
-            <p>
-              Traditional Japanese sushi
-              dining experience.
-            </p>
-
-            <div class="activity-info">
-
-              <span>⏰ 2 Hours</span>
-
-              <span class="cost">
-                $90
-              </span>
-
-            </div>
-
-          </div>
-
-        </div>
-
+      <div class="timeline" id="itineraryTimeline">
+        <!-- Timeline cards loaded dynamically -->
       </div>
 
     </div>
@@ -617,23 +505,113 @@ Connected with Itinerary Builder
 
   <!-- JAVASCRIPT -->
 
+  <script src="backend/traveloop.js"></script>
   <script>
 
+    let currentItineraryId = null;
+
+    async function initializeItineraryPage(){
+      try {
+        const tripsResp = await TravelLoopAPI.trips.list();
+        const trips = tripsResp.trips || [];
+        const tripSelect = document.getElementById('itineraryTripSelect');
+
+        trips.forEach(trip => {
+          const option = document.createElement('option');
+          option.value = trip.id;
+          option.textContent = `${trip.name} (${trip.destination})`;
+          tripSelect.appendChild(option);
+        });
+
+        if (trips.length > 0) {
+          tripSelect.value = trips[0].id;
+          await loadItinerary();
+        }
+      } catch (error) {
+        console.error('Error loading itineraries:', error);
+      }
+    }
+
+    async function loadItinerary(){
+      const itineraryId = document.getElementById('itineraryTripSelect').value;
+      if (!itineraryId) {
+        return;
+      }
+
+      currentItineraryId = itineraryId;
+
+      try {
+        const response = await TravelLoopAPI.itinerary.load(itineraryId);
+        const itinerary = response.itinerary;
+
+        document.getElementById('itineraryTitle').textContent = itinerary.title || 'Trip Itinerary';
+        document.getElementById('itineraryDescription').textContent = itinerary.summary || 'Your travel journey';
+
+        const stops = itinerary.stops || [];
+        document.getElementById('itineraryCities').textContent = `${stops.length} Stops`;
+
+        let totalDays = 0;
+        stops.forEach(stop => {
+          if (stop.arrival_date && stop.departure_date) {
+            const diff = Math.ceil((new Date(stop.departure_date) - new Date(stop.arrival_date)) / (1000 * 60 * 60 * 24));
+            totalDays += diff;
+          }
+        });
+        document.getElementById('itineraryDays').textContent = `${totalDays} Days`;
+
+        const timeline = document.getElementById('itineraryTimeline');
+        timeline.innerHTML = '';
+
+        if (stops.length === 0) {
+          timeline.innerHTML = '<div style="padding:40px;text-align:center;color:#6b7280;">No stops added to this itinerary.</div>';
+          return;
+        }
+
+        stops.forEach((stop, idx) => {
+          const card = document.createElement('div');
+          card.className = 'timeline-card';
+          const arrivalDate = new Date(stop.arrival_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          card.innerHTML = `
+            <div class="timeline-header">
+              <h2>Day ${idx + 1} - ${stop.city}</h2>
+              <span>${arrivalDate}</span>
+            </div>`;
+
+          if (stop.activities && Array.isArray(stop.activities)) {
+            stop.activities.forEach(activity => {
+              const activityDiv = document.createElement('div');
+              activityDiv.className = 'activity';
+              activityDiv.innerHTML = `
+                <h3>${activity.name || 'Activity'}</h3>
+                <p>${activity.description || 'No description'}</p>
+                <div class="activity-info">
+                  <span>⏰ ${activity.duration || 'N/A'} Hours</span>
+                  <span class="cost">$${parseFloat(activity.cost || 0).toFixed(2)}</span>
+                </div>`;
+              card.appendChild(activityDiv);
+            });
+          }
+
+          timeline.appendChild(card);
+        });
+      } catch (error) {
+        showNotification(error.message, false);
+      }
+    }
+
     function shareTrip(){
-
-      alert(
-        "Trip Share Link Generated!"
-      );
-
+      if (currentItineraryId) {
+        showNotification('Share link generated!');
+      } else {
+        showNotification('Select an itinerary to share', false);
+      }
     }
 
     function downloadPDF(){
-
-      alert(
-        "Downloading Itinerary PDF..."
-      );
-
+      showNotification('Downloading itinerary PDF...');
     }
+
+    document.addEventListener('DOMContentLoaded', initializeItineraryPage);
 
   </script>
 

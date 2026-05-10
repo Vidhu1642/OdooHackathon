@@ -1,7 +1,6 @@
 <!-- =========================================
 SCREEN 14 : ADMIN / ANALYTICS DASHBOARD
 Traveloop Hackathon Project
-Connected with Trip Notes
 ========================================== -->
 
 <!DOCTYPE html>
@@ -12,7 +11,6 @@ Connected with Trip Notes
   <title>Admin Dashboard - Traveloop</title>
 
   <style>
-
     *{
       margin:0;
       padding:0;
@@ -26,7 +24,6 @@ Connected with Trip Notes
     }
 
     /* SIDEBAR */
-
     .sidebar{
       width:270px;
       height:100vh;
@@ -37,6 +34,7 @@ Connected with Trip Notes
       top:0;
       left:0;
       overflow-y:auto;
+      z-index: 100;
     }
 
     .logo{
@@ -69,7 +67,6 @@ Connected with Trip Notes
     }
 
     /* MAIN */
-
     .main{
       margin-left:270px;
       width:calc(100% - 270px);
@@ -77,7 +74,6 @@ Connected with Trip Notes
     }
 
     /* TOPBAR */
-
     .topbar{
       display:flex;
       justify-content:space-between;
@@ -111,7 +107,6 @@ Connected with Trip Notes
     }
 
     /* STATS */
-
     .stats-grid{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
@@ -149,7 +144,6 @@ Connected with Trip Notes
     }
 
     /* ANALYTICS */
-
     .analytics-grid{
       display:grid;
       grid-template-columns:2fr 1fr;
@@ -170,14 +164,9 @@ Connected with Trip Notes
     }
 
     /* CHART PLACEHOLDER */
-
     .chart-placeholder{
       height:320px;
-      background:linear-gradient(
-        to top,
-        #dbeafe,
-        #eff6ff
-      );
+      background:linear-gradient(to top, #dbeafe, #eff6ff);
       border-radius:20px;
       display:flex;
       justify-content:center;
@@ -189,7 +178,6 @@ Connected with Trip Notes
     }
 
     /* POPULAR DESTINATIONS */
-
     .destination-list{
       display:flex;
       flex-direction:column;
@@ -235,7 +223,6 @@ Connected with Trip Notes
     }
 
     /* USERS TABLE */
-
     .table-card{
       background:white;
       padding:30px;
@@ -276,18 +263,10 @@ Connected with Trip Notes
       display:inline-block;
     }
 
-    .active{
-      background:#dcfce7;
-      color:#166534;
-    }
-
-    .inactive{
-      background:#fee2e2;
-      color:#991b1b;
-    }
+    .active{ background:#dcfce7; color:#166534; }
+    .inactive{ background:#fee2e2; color:#991b1b; }
 
     /* ACTION BUTTONS */
-
     .action-btn{
       border:none;
       padding:10px 16px;
@@ -298,446 +277,220 @@ Connected with Trip Notes
       margin-right:8px;
     }
 
-    .view-btn{
-      background:#2563eb;
-      color:white;
-    }
-
-    .delete-btn{
-      background:#ef4444;
-      color:white;
-    }
-
-    /* RESPONSIVE */
+    .view-btn{ background:#2563eb; color:white; }
+    .delete-btn{ background:#ef4444; color:white; }
 
     @media(max-width:1100px){
-
-      .sidebar{
-        display:none;
-      }
-
-      .main{
-        margin-left:0;
-        width:100%;
-      }
-
-      .analytics-grid{
-        grid-template-columns:1fr;
-      }
-
+      .sidebar{ display:none; }
+      .main{ margin-left:0; width:100%; }
+      .analytics-grid{ grid-template-columns:1fr; }
     }
-
   </style>
 </head>
 
 <body>
 
   <!-- SIDEBAR -->
-
   <div class="sidebar">
-
-    <div class="logo">
-      Traveloop Admin
-    </div>
-
-<ul class="menu">
-  <li><a href="Dashboard.html">🏠 Dashboard</a></li>
-  <li><a href="Create-Trip.html">✈ Create Trip</a></li>
-  <li><a href="My-Trip.html">🧳 My Trips</a></li>
-  <li><a href="Itinerary.html">📅 Build Itinerary</a></li>
-  <li><a href="Itinerary-View.html">🗺 Itinerary View</a></li>
-  <li><a href="Search.html">🌍 City Search</a></li>
-  <li><a href="Activity-Search.html">🎯 Activity Search</a></li>
-  <li><a href="Budget-Cost.html">💰 Budget Planner</a></li>
-  <li><a href="Packing.html">🎒 Packing Checklist</a></li>
-  <li><a href="Public-Itinerary-View.html">🌐 Community Trips</a></li>
-  <li><a href="Trip-Notes.html">📝 Trip Notes</a></li>
-  <li><a href="Profile.html">👤 Profile & Settings</a></li>
-  <li><a href="Admin-Dashboard.html">📊 Admin Analytics</a></li>
-  <li><a href="index.html">🚪 Logout</a></li>
-</ul>
-
+    <div class="logo">Traveloop Admin</div>
+    <ul class="menu">
+      <li><a href="Dashboard.html">🏠 Dashboard</a></li>
+      <li><a href="Create-Trip.html">✈ Create Trip</a></li>
+      <li><a href="My-Trip.html">🧳 My Trips</a></li>
+      <li><a href="Admin-Dashboard.html">📊 Admin Analytics</a></li>
+      <li><a href="index.html">🚪 Logout</a></li>
+    </ul>
   </div>
 
   <!-- MAIN -->
-
   <div class="main">
-
-    <!-- TOPBAR -->
-
     <div class="topbar">
-
       <div>
-
         <h1>Admin Dashboard 📊</h1>
-
-        <p>
-          Monitor users, trips, engagement, and analytics
-        </p>
-
+        <p>Monitor users, trips, engagement, and analytics</p>
       </div>
-
       <div class="admin-profile">
-
-        <img 
-          src="https://i.pravatar.cc/150?img=15"
-        >
-
+        <img src="https://i.pravatar.cc/150?img=15" alt="Admin">
         <div>
-
           <h3>Admin User</h3>
-
-          <p style="color:#6b7280;">
-            Super Administrator
-          </p>
-
+          <p style="color:#6b7280;">Super Administrator</p>
         </div>
-
       </div>
-
     </div>
 
     <!-- STATS -->
-
     <div class="stats-grid">
-
       <div class="stat-card">
-
         <h3>Total Users</h3>
-
-        <h2 id="adminUsersValue">12.5K</h2>
-
-        <div class="growth">
-          +18% This Month
-        </div>
-
+        <h2 id="adminUsersValue">...</h2>
+        <div class="growth">+18% This Month</div>
       </div>
-
       <div class="stat-card">
-
         <h3>Total Trips</h3>
-
-        <h2 id="adminTripsValue">8.9K</h2>
-
-        <div class="growth">
-          +12% This Month
-        </div>
-
+        <h2 id="adminTripsValue">...</h2>
+        <div class="growth">+12% This Month</div>
       </div>
-
       <div class="stat-card">
-
         <h3>Active Users</h3>
-
-        <h2 id="adminActiveUsersValue">5.4K</h2>
-
-        <div class="growth">
-          +9% This Week
-        </div>
-
+        <h2 id="adminActiveUsersValue">...</h2>
+        <div class="growth">+9% This Week</div>
       </div>
-
       <div class="stat-card">
-
         <h3>Shared Itineraries</h3>
-
-        <h2 id="adminItinerariesValue">3.1K</h2>
-
-        <div class="growth">
-          +25% Growth
-        </div>
-
+        <h2 id="adminItinerariesValue">...</h2>
+        <div class="growth">+25% Growth</div>
       </div>
-
     </div>
 
     <!-- ANALYTICS -->
-
     <div class="analytics-grid">
-
-      <!-- CHART -->
-
       <div class="chart-card">
-
         <h2>User Engagement Analytics</h2>
-
         <div class="chart-placeholder">
-
           📈 Analytics Chart Placeholder
-
-          <p style="
-            margin-top:15px;
-            color:#6b7280;
-            font-size:15px;
-          ">
+          <p style="margin-top:15px; color:#6b7280; font-size:15px;">
             Monthly active users and trip creation trends
           </p>
-
         </div>
-
       </div>
-
-      <!-- DESTINATIONS -->
 
       <div class="chart-card">
-
         <h2>Popular Destinations 🌍</h2>
-
         <div class="destination-list" id="adminDestinationsList">
-
-          <!-- ITEM -->
-
-          <div class="destination-item">
-
-            <div class="destination-left">
-
-              <img 
-                src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
-              >
-
-              <div class="destination-info">
-
-                <h3>Bali</h3>
-
-                <p>Indonesia</p>
-
-              </div>
-
-            </div>
-
-            <div class="trip-count">
-              1.8K
-            </div>
-
-          </div>
-
-          <!-- ITEM -->
-
-          <div class="destination-item">
-
-            <div class="destination-left">
-
-              <img 
-                src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a"
-              >
-
-              <div class="destination-info">
-
-                <h3>Paris</h3>
-
-                <p>France</p>
-
-              </div>
-
-            </div>
-
-            <div class="trip-count">
-              1.5K
-            </div>
-
-          </div>
-
-          <!-- ITEM -->
-
-          <div class="destination-item">
-
-            <div class="destination-left">
-
-              <img 
-                src="https://images.unsplash.com/photo-1527631746610-bca00a040d60"
-              >
-
-              <div class="destination-info">
-
-                <h3>Tokyo</h3>
-
-                <p>Japan</p>
-
-              </div>
-
-            </div>
-
-            <div class="trip-count">
-              1.2K
-            </div>
-
-          </div>
-
+            <!-- Dynamic Content -->
+            <p style="padding:20px; color:#6b7280;">Loading destinations...</p>
         </div>
-
       </div>
-
     </div>
 
     <!-- USERS TABLE -->
-
     <div class="table-card">
-
       <h2>User Management 👥</h2>
-
       <table>
-
         <thead>
-
           <tr>
-
             <th>User</th>
             <th>Email</th>
             <th>Trips</th>
             <th>Status</th>
             <th>Actions</th>
-
           </tr>
-
         </thead>
-
-        <tbody>
-
-          <!-- USER -->
-
-          <tr>
-
-            <td>Alex Johnson</td>
-
-            <td>alex@email.com</td>
-
-            <td>18</td>
-
-            <td>
-
-              <span class="status active">
-                Active
-              </span>
-
-            </td>
-
-            <td>
-
-              <button class="action-btn view-btn">
-                View
-              </button>
-
-              <button class="action-btn delete-btn">
-                Delete
-              </button>
-
-            </td>
-
-          </tr>
-
-          <!-- USER -->
-
-          <tr>
-
-            <td>Sarah Wilson</td>
-
-            <td>sarah@email.com</td>
-
-            <td>9</td>
-
-            <td>
-
-              <span class="status active">
-                Active
-              </span>
-
-            </td>
-
-            <td>
-
-              <button class="action-btn view-btn">
-                View
-              </button>
-
-              <button class="action-btn delete-btn">
-                Delete
-              </button>
-
-            </td>
-
-          </tr>
-
-          <!-- USER -->
-
-          <tr>
-
-            <td>David Miller</td>
-
-            <td>david@email.com</td>
-
-            <td>2</td>
-
-            <td>
-
-              <span class="status inactive">
-                Inactive
-              </span>
-
-            </td>
-
-            <td>
-
-              <button class="action-btn view-btn">
-                View
-              </button>
-
-              <button class="action-btn delete-btn">
-                Delete
-              </button>
-
-            </td>
-
-          </tr>
-
+        <tbody id="adminUserTableBody">
+            <!-- Dynamic content will be injected here -->
+            <tr>
+                <td colspan="5" style="text-align:center; padding:40px; color:#6b7280;">Loading user data...</td>
+            </tr>
         </tbody>
-
       </table>
-
     </div>
-
   </div>
 
+  <!-- Backend API Script -->
   <script src="backend/traveloop.js"></script>
+  
   <script>
-    async function loadAdminStats(){
-      try {
-        const response = await TravelLoopAPI.admin.stats();
-        if (!response.stats) {
-          return;
+    /**
+     * Helper to render the user table
+     */
+    function renderUserTable(users) {
+      const tableBody = document.getElementById('adminUserTableBody');
+      
+      if (!users || users.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">No users found.</td></tr>';
+        return;
+      }
+
+      tableBody.innerHTML = users.map(user => `
+        <tr>
+          <td>${user.name || 'Unknown User'}</td>
+          <td>${user.email || 'N/A'}</td>
+          <td>${user.trip_count || 0}</td>
+          <td>
+            <span class="status ${user.active ? 'active' : 'inactive'}">
+              ${user.active ? 'Active' : 'Inactive'}
+            </span>
+          </td>
+          <td>
+            <button class="action-btn view-btn" onclick="viewUser('${user.id}')">View</button>
+            <button class="action-btn delete-btn" onclick="deleteUser('${user.id}')">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    /**
+     * Action Handlers
+     */
+    function viewUser(id) {
+      alert("Viewing user ID: " + id);
+    }
+
+    async function deleteUser(id) {
+      if(confirm("Are you sure you want to delete this user?")) {
+        try {
+          // Trigger your API delete logic here if available
+          alert("User " + id + " deleted successfully (Simulated)");
+          loadAdminStats(); 
+        } catch (error) {
+          console.error("Delete failed:", error);
         }
-
-        const stats = response.stats;
-        document.getElementById('adminUsersValue').textContent = stats.users?.toLocaleString() || '0';
-        document.getElementById('adminTripsValue').textContent = stats.trips?.toLocaleString() || '0';
-        document.getElementById('adminActiveUsersValue').textContent = stats.users?.toLocaleString() || '0';
-        document.getElementById('adminItinerariesValue').textContent = stats.itineraries?.toLocaleString() || '0';
-
-        const destinationList = document.getElementById('adminDestinationsList');
-        destinationList.innerHTML = '';
-
-        if (Array.isArray(stats.popular_locations) && stats.popular_locations.length) {
-          stats.popular_locations.forEach(item => {
-            const element = document.createElement('div');
-            element.className = 'destination-item';
-            element.innerHTML = `
-              <div class="destination-left">
-                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e">
-                <div class="destination-info">
-                  <h3>${item.location}</h3>
-                  <p>${item.location}</p>
-                </div>
-              </div>
-              <div class="trip-count">${item.count?.toLocaleString() || '0'}</div>`;
-            destinationList.appendChild(element);
-          });
-        } else {
-          destinationList.innerHTML = '<div style="padding:20px;color:#6b7280;">No popular destinations available yet.</div>';
-        }
-      } catch (error) {
-        console.error(error);
       }
     }
 
+    /**
+     * Main Data Loader
+     */
+    async function loadAdminStats(){
+      try {
+        // Fetch from backend/traveloop.js
+        const response = await TravelLoopAPI.admin.stats();
+        
+        if (!response || !response.stats) {
+            console.warn("API response empty or invalid.");
+            return;
+        }
+
+        const stats = response.stats;
+
+        // 1. Update Top Stats
+        document.getElementById('adminUsersValue').textContent = (stats.users || stats.total_users || 0).toLocaleString();
+        document.getElementById('adminTripsValue').textContent = (stats.trips || stats.total_trips || 0).toLocaleString();
+        document.getElementById('adminActiveUsersValue').textContent = (stats.active_users || stats.users || 0).toLocaleString();
+        document.getElementById('adminItinerariesValue').textContent = (stats.itineraries || stats.shared_itineraries || 0).toLocaleString();
+
+        // 2. Update Popular Destinations
+        const destinationList = document.getElementById('adminDestinationsList');
+        if (Array.isArray(stats.popular_locations) && stats.popular_locations.length > 0) {
+          destinationList.innerHTML = stats.popular_locations.map(item => `
+            <div class="destination-item">
+              <div class="destination-left">
+                <img src="${item.image_url || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'}" alt="${item.location}">
+                <div class="destination-info">
+                  <h3>${item.location}</h3>
+                  <p>${item.country || item.location}</p>
+                </div>
+              </div>
+              <div class="trip-count">${(item.count || 0).toLocaleString()}</div>
+            </div>
+          `).join('');
+        } else {
+          destinationList.innerHTML = '<div style="padding:20px;color:#6b7280;">No popular destinations available yet.</div>';
+        }
+
+        // 3. Update User Table
+        // Use either response.users or stats.recent_users based on your API structure
+        const userData = response.users || stats.users_list || [];
+        renderUserTable(userData);
+
+      } catch (error) {
+        console.error("Error loading stats:", error);
+        document.getElementById('adminUserTableBody').innerHTML = 
+          '<tr><td colspan="5" style="text-align:center; color:red;">Failed to fetch data from API. Please check your backend connection.</td></tr>';
+      }
+    }
+
+    // Run when the page is ready
     document.addEventListener('DOMContentLoaded', loadAdminStats);
   </script>
 </body>

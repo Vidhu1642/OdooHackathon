@@ -705,83 +705,41 @@ Connected with Itinerary Builder
   <!-- JAVASCRIPT -->
 
   <script src="backend/traveloop.js"></script>
-  <script>
+<script>
+  async function searchCity() {
+    const query = document.getElementById('citySearchQuery').value.trim();
+    try {
+      const response = await TravelLoopAPI.search.query(query); //
+      const cityGrid = document.querySelector('.city-grid');
+      cityGrid.innerHTML = '';
 
-    async function searchCity(){
-      const query = document.getElementById('citySearchQuery').value.trim();
-      if (!query) {
-        return showNotification('Enter a search term for cities.', false);
-      }
+      // Results are pulled from activities_catalog and trips tables
+      const allResults = [...response.results.activities, ...response.results.trips];
 
-      try {
-        const response = await TravelLoopAPI.search.query(query);
-        const cityGrid = document.querySelector('.city-grid');
-        cityGrid.innerHTML = '';
+      allResults.forEach(item => {
+        const name = item.name;
+        const loc = item.location || item.destination;
+        const card = document.createElement('div');
+        card.className = 'city-card';
+        card.innerHTML = `
+          <div class="city-image">
+            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e">
+            <div class="country-badge">${loc}</div>
+          </div>
+          <div class="city-content">
+            <h2>${name}</h2>
+            <p>${item.description || 'Explore this beautiful destination.'}</p>
+            <button class="add-btn" onclick="addToTrip('${name}')">Add to Trip</button>
+          </div>`;
+        cityGrid.appendChild(card);
+      });
+    } catch (e) { alert("Search failed: " + e.message); }
+  }
 
-        const results = [];
-        if (response.results.activities) {
-          response.results.activities.forEach(activity => {
-            results.push({
-              title: activity.name,
-              description: activity.description || 'Experience this activity in ' + (activity.location || 'an exciting destination'),
-              location: activity.location || 'Unknown',
-              category: activity.category || 'Activity',
-              cost: activity.cost || 0
-            });
-          });
-        }
-
-        if (response.results.trips) {
-          response.results.trips.forEach(trip => {
-            results.push({
-              title: trip.name,
-              description: trip.description || 'Plan your trip to ' + (trip.destination || 'an exciting destination'),
-              location: trip.destination || 'Unknown',
-              category: 'Trip',
-              cost: trip.budget || 0
-            });
-          });
-        }
-
-        if (results.length === 0) {
-          cityGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#6b7280;">No results found.</div>';
-          return;
-        }
-
-        results.forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'city-card';
-          card.innerHTML = `
-            <div class="city-image">
-              <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e" />
-              <div class="country-badge">${item.location}</div>
-            </div>
-            <div class="city-content">
-              <h2>${item.title}</h2>
-              <p>${item.description}</p>
-              <div class="city-info">
-                <div class="info-box"><h4>Popularity</h4><span>9.2/10</span></div>
-                <div class="info-box"><h4>Avg Budget</h4><span>$${parseFloat(item.cost).toFixed(2)}</span></div>
-                <div class="info-box"><h4>Category</h4><span>${item.category}</span></div>
-                <div class="info-box"><h4>Location</h4><span>${item.location}</span></div>
-              </div>
-              <div class="btn-group">
-                <button class="btn details-btn">Details</button>
-                <button class="btn add-btn" onclick="addToTrip(${JSON.stringify(item.title)})">Add to Trip</button>
-              </div>
-            </div>`;
-          cityGrid.appendChild(card);
-        });
-      } catch (error) {
-        showNotification(error.message, false);
-      }
-    }
-
-    function addToTrip(city){
-      showNotification(city + ' added to your trip!');
-    }
-
-  </script>
+  function addToTrip(name) {
+    alert(name + " has been added to your trip plan!");
+  }
+</script>
 
 </body>
 </html>

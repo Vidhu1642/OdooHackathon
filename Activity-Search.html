@@ -320,383 +320,38 @@ Connected with City Search
 
   </style>
 </head>
-
 <body>
-
-  <!-- SIDEBAR -->
-
-  <div class="sidebar">
-
-    <div class="logo">
-      Traveloop
-    </div>
-
-<ul class="menu">
-  <li><a href="Dashboard.html">🏠 Dashboard</a></li>
-  <li><a href="Create-Trip.html">✈ Create Trip</a></li>
-  <li><a href="My-Trip.html">🧳 My Trips</a></li>
-  <li><a href="Itinerary.html">📅 Build Itinerary</a></li>
-  <li><a href="Itinerary-View.html">🗺 Itinerary View</a></li>
-  <li><a href="Search.html">🌍 City Search</a></li>
-  <li><a href="Activity-Search.html">🎯 Activity Search</a></li>
-  <li><a href="Budget-Cost.html">💰 Budget Planner</a></li>
-  <li><a href="Packing.html">🎒 Packing Checklist</a></li>
-  <li><a href="Public-Itinerary-View.html">� Community Trips</a></li>
-  <li><a href="Trip-Notes.html">📝 Trip Notes</a></li>
-  <li><a href="Profile.html">👤 Profile & Settings</a></li>
-  <li><a href="Admin-Dashboard.html">� Admin Analytics</a></li>
-  <li><a href="index.html">🚪 Logout</a></li>
-</ul>
-
-  </div>
-
-  <!-- MAIN -->
-
   <div class="main">
-
-    <!-- TOPBAR -->
-
     <div class="topbar">
-
-      <div>
-
-        <h1>Discover Activities 🎯</h1>
-
-        <p>
-          Explore experiences and add them to your trip
-        </p>
-
-      </div>
-
-      <button class="view-trip-btn">
-        View Itinerary
-      </button>
-
+      <h1>Discover Activities 🎯</h1>
+      <button class="view-trip-btn" onclick="location.href='My-Trip.html'">View My Trips</button>
     </div>
-
-    <!-- SEARCH -->
 
     <div class="search-section">
-
       <div class="search-grid">
-
-        <input 
-          id="activitySearchQuery"
-          type="text"
-          placeholder="Search activities..."
-        >
-
-        <select id="activityCategorySelect">
-
-          <option>All Categories</option>
-          <option>Adventure</option>
-          <option>Food</option>
-          <option>Nature</option>
-          <option>Culture</option>
-          <option>Nightlife</option>
-
-        </select>
-
-        <select>
-
-          <option>Budget</option>
-          <option>Low Cost</option>
-          <option>Medium</option>
-          <option>Luxury</option>
-
-        </select>
-
-        <button class="search-btn"
-          onclick="searchActivity()">
-
-          Search
-
-        </button>
-
+        <input id="activitySearchQuery" type="text" placeholder="Search activities (e.g., Beach, Sushi)...">
+        <button class="search-btn" onclick="searchActivity()">Search</button>
       </div>
-
-      <!-- TAGS -->
-
-      <div class="categories">
-
-        <div class="category">Beach</div>
-        <div class="category">Hiking</div>
-        <div class="category">Food Tour</div>
-        <div class="category">Museum</div>
-        <div class="category">Shopping</div>
-        <div class="category">Nightlife</div>
-
-      </div>
-
     </div>
 
-    <!-- ACTIVITIES -->
-
-    <div class="activity-grid">
-
-      <!-- CARD 1 -->
-
-      <div class="activity-card">
-
-        <div class="activity-image">
-
-          <img 
-            src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
-          >
-
-          <div class="activity-type">
-            Beach
-          </div>
-
-        </div>
-
-        <div class="activity-content">
-
-          <h2>Bali Beach Adventure</h2>
-
-          <p>
-            Relax on tropical beaches and
-            enjoy water sports with guided tours.
-          </p>
-
-          <div class="activity-info">
-
-            <div class="info-box">
-
-              <h4>Duration</h4>
-
-              <span>3 Hours</span>
-
-            </div>
-
-            <div class="info-box">
-
-              <h4>Cost</h4>
-
-              <span>$80</span>
-
-            </div>
-
-            <div class="info-box">
-
-              <h4>Rating</h4>
-
-              <span>4.8 ⭐</span>
-
-            </div>
-
-            <div class="info-box">
-
-              <h4>City</h4>
-
-              <span>Bali</span>
-
-            </div>
-
-          </div>
-
-          <div class="btn-group">
-
-            <button class="btn details-btn">
-              Details
-            </button>
-
-            <button class="btn add-btn"
-              onclick="addActivity('Bali Beach Adventure')">
-
-              Add Activity
-
-            </button>
-
-          </div>
-
-        </div>
-
+    <div class="activity-grid" id="activityResults">
       </div>
-
-      <!-- CARD 2 -->
-
-      <div class="activity-card">
-
-        <div class="activity-image">
-
-          <img 
-            src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5"
-          >
-
-          <div class="activity-type">
-            Food Tour
-          </div>
-
-        </div>
-
-        <div class="activity-content">
-
-          <h2>Tokyo Sushi Experience</h2>
-
-          <p>
-            Experience authentic Japanese sushi
-            and traditional food culture.
-          </p>
-
-          <div class="activity-info">
-
-            <div class="info-box">
-
-              <h4>Duration</h4>
-
-              <span>2 Hours</span>
-
-            </div>
-
-            <div class="info-box">
-
-              <h4>Cost</h4>
-
-              <span>$120</span>
-
-            </div>
-
-            <div class="info-box">
-
-              <h4>Rating</h4>
-
-              <span>4.9 ⭐</span>
-
-            </div>
-
-            <div class="info-box">
-
-              <h4>City</h4>
-
-              <span>Tokyo</span>
-
-            </div>
-
-          </div>
-
-          <div class="btn-group">
-
-            <button class="btn details-btn">
-              Details
-            </button>
-
-            <button class="btn add-btn"
-              onclick="addActivity('Tokyo Sushi Experience')">
-
-              Add Activity
-
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- CARD 3 -->
-
-      <div class="activity-card">
-
-        <div class="activity-image">
-
-          <img 
-            src="https://images.unsplash.com/photo-1527631746610-bca00a040d60"
-          >
-
-          <div class="activity-type">
-            Culture
-          </div>
-
-        </div>
-
-        <div class="activity-content">
-
-          <h2>Anime District Tour</h2>
-
-          <p>
-            Explore anime shops, gaming arcades,
-            and Japanese pop culture.
-          </p>
-
-          <div class="activity-info">
-
-            <div class="info-box">
-
-              <h4>Duration</h4>
-
-              <span>5 Hours</span>
-
-            </div>
-
-            <div class="info-box">
-
-              <h4>Cost</h4>
-
-              <span>$150</span>
-
-            </div>
-
-            <div class="info-box">
-
-              <h4>Rating</h4>
-
-              <span>4.7 ⭐</span>
-
-            </div>
-
-            <div class="info-box">
-
-              <h4>City</h4>
-
-              <span>Tokyo</span>
-
-            </div>
-
-          </div>
-
-          <div class="btn-group">
-
-            <button class="btn details-btn">
-              Details
-            </button>
-
-            <button class="btn add-btn"
-              onclick="addActivity('Anime District Tour')">
-
-              Add Activity
-
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
   </div>
-
-  <!-- JAVASCRIPT -->
 
   <script src="backend/traveloop.js"></script>
   <script>
-
-    async function searchActivity(){
+    async function searchActivity() {
       const query = document.getElementById('activitySearchQuery').value.trim();
-      if (!query) {
-        return showNotification('Enter an activity to search for.', false);
-      }
+      if (!query) return alert('Please enter an activity name');
 
       try {
-        const response = await TravelLoopAPI.search.query(query);
-        const grid = document.querySelector('.activity-grid');
+        const response = await TravelLoopAPI.search.query(query); //
+        const grid = document.getElementById('activityResults');
         grid.innerHTML = '';
 
-        if (!response.results.activities || response.results.activities.length === 0) {
-          grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#6b7280;">No activities found.</div>';
-          return;
+        if (!response.results.activities.length) {
+            grid.innerHTML = '<p>No activities found matching your search.</p>';
+            return;
         }
 
         response.results.activities.forEach(activity => {
@@ -704,30 +359,26 @@ Connected with City Search
           card.className = 'activity-card';
           card.innerHTML = `
             <div class="activity-image">
-              <img src="https://images.unsplash.com/photo-1519817650390-64a93db511aa" />
-              <div class="activity-category">${activity.category || 'Activity'}</div>
+              <img src="https://images.unsplash.com/photo-1519817650390-64a93db511aa">
+              <div class="activity-type">${activity.category}</div>
             </div>
             <div class="activity-content">
               <h2>${activity.name}</h2>
-              <p>${activity.description || 'Enjoy this unique experience.'}</p>
-              <div class="activity-details">
-                <span>${activity.location || 'Unknown destination'}</span>
-                <span>Budget: $${parseFloat(activity.cost || 0).toFixed(2)}</span>
+              <p>${activity.description}</p>
+              <div class="activity-info">
+                <div class="info-box"><h4>Cost</h4><span>$${activity.cost}</span></div>
+                <div class="info-box"><h4>Location</h4><span>${activity.location}</span></div>
               </div>
-              <button class="add-btn" onclick="addActivity(${JSON.stringify(activity.name)})">Add Activity</button>
+              <button class="add-btn" onclick="addActivity('${activity.name}')">Add Activity</button>
             </div>`;
           grid.appendChild(card);
         });
-      } catch (error) {
-        showNotification(error.message, false);
-      }
+      } catch (e) { console.error(e); }
     }
 
-    function addActivity(activity){
-      showNotification(activity + ' added to itinerary!');
+    function addActivity(name) {
+      alert(name + " added to your planning list!");
     }
-
   </script>
-
 </body>
 </html>

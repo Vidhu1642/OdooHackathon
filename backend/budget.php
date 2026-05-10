@@ -21,6 +21,7 @@ switch ($action) {
                 $existing['id']
             ]);
             jsonResponse(['success' => true, 'message' => 'Budget updated successfully.']);
+            break;
         }
 
         $stmt = $pdo->prepare('INSERT INTO budgets (user_id, trip_id, total_budget, spent_amount, notes, updated_at) VALUES (?, ?, ?, ?, ?, NOW())');

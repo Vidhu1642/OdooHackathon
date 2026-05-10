@@ -314,190 +314,62 @@ Connected with Create Trip Screen
 
   </style>
 </head>
-
 <body>
-
-  <!-- SIDEBAR -->
-
-  <div class="sidebar">
-
-    <div class="logo">
-      Traveloop
-    </div>
-
-<ul class="menu">
-  <li><a href="Dashboard.html">🏠 Dashboard</a></li>
-  <li><a href="Create-Trip.html">✈ Create Trip</a></li>
-  <li><a href="My-Trip.html">🧳 My Trips</a></li>
-  <li><a href="Itinerary.html">📅 Build Itinerary</a></li>
-  <li><a href="Itinerary-View.html">🗺 Itinerary View</a></li>
-  <li><a href="Search.html">🌍 City Search</a></li>
-  <li><a href="Activity-Search.html">🎯 Activity Search</a></li>
-  <li><a href="Budget-Cost.html">💰 Budget Planner</a></li>
-  <li><a href="Packing.html">🎒 Packing Checklist</a></li>
-  <li><a href="Public-Itinerary-View.html">🌐 Community Trips</a></li>
-  <li><a href="Trip-Notes.html">📝 Trip Notes</a></li>
-  <li><a href="Profile.html">👤 Profile & Settings</a></li>
-  <li><a href="Admin-Dashboard.html">📊 Admin Analytics</a></li>
-  <li><a href="index.html">🚪 Logout</a></li>
-</ul>
-
-  </div>
-
-  <!-- MAIN -->
-
   <div class="main">
-
-    <!-- HEADER -->
-
     <div class="topbar">
-
-      <div>
-
-        <h1>My Trips ✈</h1>
-
-        <p>
-          Manage and explore all your travel plans
-        </p>
-
-      </div>
-
-      <button onclick="createTrip()">
-        + Create New Trip
-      </button>
-
+      <h1>My Trips ✈</h1>
+      <button onclick="location.href='Create-Trip.html'">+ Create New Trip</button>
     </div>
-
-    <!-- FILTERS -->
-
-    <div class="filters">
-
-      <input 
-        type="text"
-        placeholder="Search trips..."
-      >
-
-      <select>
-
-        <option>All Trips</option>
-        <option>Upcoming</option>
-        <option>Completed</option>
-        <option>Cancelled</option>
-
-      </select>
-
-      <select>
-
-        <option>Sort By</option>
-        <option>Newest</option>
-        <option>Oldest</option>
-        <option>Budget</option>
-
-      </select>
-
-    </div>
-
-    <!-- TRIPS -->
 
     <div class="trip-grid" id="tripGrid"></div>
-
-    <!-- EMPTY STATE -->
-
-    <div class="empty" id="emptyState" style="display:none;">
-
-      <h2>No Trips Available</h2>
-
-      <p>
-        Start planning your next adventure now.
-      </p>
-
-      <button onclick="window.location.href='Create-Trip.html'">
-        Create Trip
-      </button>
-
-    </div>
-
+    <div class="empty" id="emptyState"><h2>No Trips Available</h2></div>
   </div>
-
-  <!-- JAVASCRIPT -->
 
   <script src="backend/traveloop.js"></script>
   <script>
-
-    document.addEventListener('DOMContentLoaded', loadTrips);
-
-    function createTrip(){
-      window.location.href = 'Create-Trip.html';
-    }
-
-    async function loadTrips(){
+    async function loadTrips() {
       try {
-        const response = await TravelLoopAPI.trips.list();
-        const tripGrid = document.getElementById('tripGrid');
-        const emptyState = document.getElementById('emptyState');
-        tripGrid.innerHTML = '';
-
-        if (!response.trips || response.trips.length === 0) {
-          emptyState.style.display = 'block';
+        const res = await TravelLoopAPI.trips.list(); //
+        const grid = document.getElementById('tripGrid');
+        const empty = document.getElementById('emptyState');
+        
+        if (!res.trips || res.trips.length === 0) {
+          empty.style.display = 'block';
+          grid.innerHTML = '';
           return;
         }
 
-        emptyState.style.display = 'none';
-
-        response.trips.forEach(trip => {
-          const card = document.createElement('div');
-          card.className = 'trip-card';
-          card.innerHTML = `
+        empty.style.display = 'none';
+        grid.innerHTML = res.trips.map(trip => `
+          <div class="trip-card">
             <div class="trip-image">
-              <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e" />
-              <div class="trip-status">${trip.status || 'Upcoming'}</div>
+              <img src="${trip.cover_photo || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'}" />
+              <div class="trip-status">${trip.status}</div>
             </div>
             <div class="trip-content">
               <h2>${trip.name}</h2>
-              <p>${trip.description || 'No description added yet.'}</p>
               <div class="trip-info">
-                <div class="info-box"><h4>Duration</h4><span>${trip.start_date && trip.end_date ? trip.start_date + ' to ' + trip.end_date : 'TBD'}</span></div>
-                <div class="info-box"><h4>Budget</h4><span>$${parseFloat(trip.budget || 0).toFixed(2)}</span></div>
-                <div class="info-box"><h4>Travelers</h4><span>${trip.travelers || 1} People</span></div>
-                <div class="info-box"><h4>Destination</h4><span>${trip.destination || 'Unknown'}</span></div>
+                <div class="info-box"><h4>Budget</h4><span>$${trip.budget}</span></div>
+                <div class="info-box"><h4>Destination</h4><span>${trip.destination}</span></div>
               </div>
               <div class="btn-group">
-                <button class="btn view-btn" onclick="window.location.href='Itinerary-View.html'">View</button>
-                <button class="btn edit-btn" onclick="window.location.href='Create-Trip.html'">Edit</button>
-                <button class="btn delete-btn" data-trip-id="${trip.id}" onclick="deleteTrip(this)">Delete</button>
+                <button class="btn view-btn" onclick="location.href='Itinerary-View.html?trip_id=${trip.id}'">View</button>
+                <button class="btn delete-btn" onclick="deleteTrip(${trip.id})">Delete</button>
               </div>
-            </div>`;
-          tripGrid.appendChild(card);
-        });
-      } catch (error) {
-        showNotification(error.message, false);
+            </div>
+          </div>
+        `).join(''); //
+      } catch (err) { alert(err.message); }
+    }
+
+    async function deleteTrip(id) {
+      if (confirm('Delete this trip permanently?')) {
+        await TravelLoopAPI.trips.delete(id); //
+        loadTrips();
       }
     }
 
-    async function deleteTrip(button){
-      const tripId = button.dataset.tripId;
-      if (!tripId) {
-        return showNotification('Trip ID not found.', false);
-      }
-
-      try {
-        await TravelLoopAPI.trips.delete(tripId);
-        button.closest('.trip-card').remove();
-        checkEmpty();
-        showNotification('Trip deleted successfully.');
-      } catch (error) {
-        showNotification(error.message, false);
-      }
-    }
-
-    function checkEmpty(){
-      const cards = document.querySelectorAll('.trip-card');
-      if (cards.length === 0) {
-        document.getElementById('emptyState').style.display = 'block';
-      }
-    }
-
+    document.addEventListener('DOMContentLoaded', loadTrips);
   </script>
-
 </body>
 </html>

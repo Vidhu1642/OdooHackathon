@@ -1,552 +1,219 @@
-<!-- =========================================
-SCREEN 3 : CREATE TRIP SCREEN
-Traveloop Hackathon Project
-Connected with Dashboard
-========================================== -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Create Trip - Traveloop</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>My Trips - Traveloop</title>
 
-  <style>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
 
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family:Arial, Helvetica, sans-serif;
-    }
+body{background:#f3f4f6;display:flex;}
 
-    body{
-      background:#f3f4f6;
-      display:flex;
-    }
+/* SIDEBAR */
+.sidebar{
+  width:260px;height:100vh;background:#1e3a8a;color:#fff;
+  padding:30px;position:fixed;
+}
+.logo{font-size:28px;font-weight:bold;margin-bottom:30px;}
+.menu li{list-style:none;margin:15px 0;}
+.menu a{color:#fff;text-decoration:none;padding:10px;display:block;border-radius:10px;}
+.menu a:hover{background:rgba(255,255,255,0.2);}
 
-    /* SIDEBAR */
+/* MAIN */
+.main{
+  margin-left:260px;width:100%;padding:30px;
+}
 
-    .sidebar{
-      width:260px;
-      height:100vh;
-      background:#1e3a8a;
-      color:white;
-      padding:30px 20px;
-      position:fixed;
-      left:0;
-      top:0;
-      overflow-y:auto;
-    }
+.topbar{
+  display:flex;justify-content:space-between;margin-bottom:30px;
+}
 
-    .sidebar::-webkit-scrollbar{
-      width:6px;
-    }
+.trip-btn{
+  background:#2563eb;color:#fff;border:none;padding:12px;border-radius:10px;
+  cursor:pointer;
+}
 
-    .sidebar::-webkit-scrollbar-thumb{
-      background:rgba(255,255,255,0.3);
-      border-radius:10px;
-    }
+/* GRID */
+.trip-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:20px;
+}
 
-    .logo{
-      font-size:32px;
-      font-weight:bold;
-      margin-bottom:40px;
-    }
+.trip-card{
+  background:#fff;
+  border-radius:15px;
+  overflow:hidden;
+  box-shadow:0 4px 10px rgba(0,0,0,0.08);
+}
 
-    .menu{
-      list-style:none;
-    }
+.trip-card img{
+  width:100%;
+  height:180px;
+  object-fit:cover;
+}
 
-    .menu li{
-      margin:20px 0;
-    }
+.trip-content{
+  padding:15px;
+}
 
-    .menu a{
-      color:white;
-      text-decoration:none;
-      font-size:18px;
-      padding:12px;
-      display:block;
-      border-radius:10px;
-      transition:0.3s;
-    }
+.trip-content h3{
+  margin-bottom:10px;
+}
 
-    .menu a:hover{
-      background:rgba(255,255,255,0.2);
-    }
+.trip-content p{
+  color:#6b7280;
+  margin-bottom:10px;
+}
 
-    /* MAIN CONTENT */
+.budget{
+  color:green;
+  font-weight:bold;
+}
 
-    .main{
-      margin-left:260px;
-      width:calc(100% - 260px);
-      padding:40px;
-    }
+.actions{
+  margin-top:10px;
+  display:flex;
+  gap:10px;
+}
 
-    /* TOPBAR */
+.delete-btn{
+  background:red;
+  color:#fff;
+  border:none;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+}
 
-    .topbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:40px;
-    }
-
-    .topbar h1{
-      font-size:38px;
-      color:#111827;
-    }
-
-    .topbar p{
-      color:#6b7280;
-      margin-top:8px;
-    }
-
-    .profile{
-      display:flex;
-      align-items:center;
-      gap:15px;
-    }
-
-    .profile img{
-      width:50px;
-      height:50px;
-      border-radius:50%;
-      object-fit:cover;
-    }
-
-    /* FORM CONTAINER */
-
-    .form-container{
-      background:white;
-      padding:40px;
-      border-radius:25px;
-      box-shadow:0 8px 20px rgba(0,0,0,0.08);
-    }
-
-    .form-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:25px;
-    }
-
-    .input-group{
-      display:flex;
-      flex-direction:column;
-    }
-
-    .input-group label{
-      margin-bottom:10px;
-      font-weight:bold;
-      color:#374151;
-    }
-
-    .input-group input,
-    .input-group textarea,
-    .input-group select{
-      padding:15px;
-      border:1px solid #d1d5db;
-      border-radius:12px;
-      font-size:16px;
-    }
-
-    .input-group textarea{
-      resize:none;
-      height:130px;
-    }
-
-    .input-group input:focus,
-    .input-group textarea:focus,
-    .input-group select:focus{
-      border-color:#2563eb;
-      outline:none;
-    }
-
-    .full-width{
-      grid-column:1/3;
-    }
-
-    /* IMAGE UPLOAD */
-
-    .upload-box{
-      border:2px dashed #cbd5e1;
-      border-radius:15px;
-      padding:40px;
-      text-align:center;
-      cursor:pointer;
-      transition:0.3s;
-      background:#f8fafc;
-    }
-
-    .upload-box:hover{
-      background:#eff6ff;
-      border-color:#2563eb;
-    }
-
-    .upload-box p{
-      color:#6b7280;
-      margin-top:10px;
-    }
-
-    /* BUTTONS */
-
-    .btn-group{
-      margin-top:35px;
-      display:flex;
-      gap:20px;
-    }
-
-    .create-btn{
-      background:#2563eb;
-      color:white;
-      border:none;
-      padding:16px 28px;
-      border-radius:12px;
-      font-size:17px;
-      font-weight:bold;
-      cursor:pointer;
-      transition:0.3s;
-    }
-
-    .create-btn:hover{
-      background:#1d4ed8;
-    }
-
-    .cancel-btn{
-      background:#e5e7eb;
-      color:#111827;
-      border:none;
-      padding:16px 28px;
-      border-radius:12px;
-      font-size:17px;
-      font-weight:bold;
-      cursor:pointer;
-    }
-
-    /* QUICK TIPS */
-
-    .tips{
-      margin-top:40px;
-      background:#eff6ff;
-      border-left:6px solid #2563eb;
-      padding:25px;
-      border-radius:15px;
-    }
-
-    .tips h3{
-      margin-bottom:15px;
-      color:#1e3a8a;
-    }
-
-    .tips ul{
-      padding-left:20px;
-      color:#374151;
-      line-height:1.8;
-    }
-
-    /* RESPONSIVE */
-
-    @media(max-width:900px){
-
-      .sidebar{
-        display:none;
-      }
-
-      .main{
-        margin-left:0;
-        width:100%;
-        padding:20px;
-      }
-
-      .form-grid{
-        grid-template-columns:1fr;
-      }
-
-      .full-width{
-        grid-column:1/2;
-      }
-
-      .topbar{
-        flex-direction:column;
-        align-items:flex-start;
-        gap:20px;
-      }
-
-    }
-
-  </style>
+.empty{
+  text-align:center;
+  margin-top:50px;
+  font-size:18px;
+  color:#6b7280;
+}
+</style>
 </head>
 
 <body>
 
-  <!-- SIDEBAR -->
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo">Traveloop</div>
+  <ul class="menu">
+    <li><a href="Dashboard.html">Dashboard</a></li>
+    <li><a href="Create-Trip.html">Create Trip</a></li>
+    <li><a href="My-Trip.html">My Trips</a></li>
+  </ul>
+</div>
 
-  <div class="sidebar">
+<!-- MAIN -->
+<div class="main">
 
-    <div class="logo">
-      Traveloop
-    </div>
-
-<ul class="menu">
-  <li><a href="Dashboard.html">🏠 Dashboard</a></li>
-  <li><a href="Create-Trip.html">✈ Create Trip</a></li>
-  <li><a href="My-Trip.html">🧳 My Trips</a></li>
-  <li><a href="Itinerary.html">📅 Build Itinerary</a></li>
-  <li><a href="Itinerary-View.html">🗺 Itinerary View</a></li>
-  <li><a href="Search.html">🌍 City Search</a></li>
-  <li><a href="Activity-Search.html">🎯 Activity Search</a></li>
-  <li><a href="Budget-Cost.html">💰 Budget Planner</a></li>
-  <li><a href="Packing.html">🎒 Packing Checklist</a></li>
-  <li><a href="Public-Itinerary-View.html">🌐 Community Trips</a></li>
-  <li><a href="Trip-Notes.html">📝 Trip Notes</a></li>
-  <li><a href="Profile.html">👤 Profile & Settings</a></li>
-  <li><a href="Admin-Dashboard.html">📊 Admin Analytics</a></li>
-  <li><a href="index.html">🚪 Logout</a></li>
-</ul>
-
+  <div class="topbar">
+    <h1>My Trips 🧳</h1>
+    <button class="trip-btn" onclick="window.location.href='Create-Trip.html'">
+      + New Trip
+    </button>
   </div>
 
-  <!-- MAIN -->
+  <div class="trip-grid" id="tripContainer"></div>
 
-  <div class="main">
+</div>
 
-    <!-- TOPBAR -->
+<script>
+const BASE_URL = "http://localhost/Traveloop/backend";
 
-    <div class="topbar">
+// 🚀 LOAD TRIPS
+async function loadTrips() {
+  try {
 
-      <div>
+    const res = await fetch(BASE_URL + "/trips.php?action=list", {
+      method: "GET",
+      credentials: "include"
+    });
 
-        <h1>Create New Trip ✈</h1>
+    const data = await res.json();
 
-        <p>
-          Start planning your next unforgettable journey
-        </p>
-
-      </div>
-
-      <div class="profile">
-
-        <img 
-          src="https://i.pravatar.cc/150?img=12"
-          alt=""
-        >
-
-      </div>
-
-    </div>
-
-    <!-- FORM -->
-
-    <div class="form-container">
-
-      <div class="form-grid">
-
-        <!-- TRIP NAME -->
-
-        <div class="input-group">
-
-          <label>Trip Name</label>
-
-          <input 
-            id="tripName"
-            type="text"
-            placeholder="Enter trip name"
-          >
-
-        </div>
-
-        <!-- DESTINATION -->
-
-        <div class="input-group">
-
-          <label>Main Destination</label>
-
-          <input 
-            id="tripDestination"
-            type="text"
-            placeholder="Enter destination"
-          >
-
-        </div>
-
-        <!-- START DATE -->
-
-        <div class="input-group">
-
-          <label>Start Date</label>
-
-          <input id="tripStartDate" type="date">
-
-        </div>
-
-        <!-- END DATE -->
-
-        <div class="input-group">
-
-          <label>End Date</label>
-
-          <input id="tripEndDate" type="date">
-
-        </div>
-
-        <!-- TRAVELERS -->
-
-        <div class="input-group">
-
-          <label>Travelers</label>
-
-          <select id="tripTravelers">
-
-            <option>1 Person</option>
-            <option>2 People</option>
-            <option>3 People</option>
-            <option>4+ People</option>
-
-          </select>
-
-        </div>
-
-        <!-- BUDGET -->
-
-        <div class="input-group">
-
-          <label>Estimated Budget</label>
-
-          <input 
-            id="tripBudget"
-            type="number"
-            placeholder="Enter estimated budget"
-          >
-
-        </div>
-
-        <!-- DESCRIPTION -->
-
-        <div class="input-group full-width">
-
-          <label>Trip Description</label>
-
-          <textarea 
-            id="tripDescription"
-            placeholder="Describe your trip plan, activities, goals, and travel preferences..."
-          ></textarea>
-
-        </div>
-
-        <!-- COVER PHOTO -->
-
-        <div class="input-group full-width">
-
-          <label>Upload Cover Photo</label>
-
-          <div class="upload-box">
-
-            <h2>📷 Upload Travel Image</h2>
-
-            <p>
-              Drag & Drop or Click to Upload
-            </p>
-
-            <input 
-              id="tripCoverPhoto"
-              type="file"
-              style="margin-top:20px;"
-            >
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- BUTTONS -->
-
-      <div class="btn-group">
-
-        <button class="create-btn" onclick="createTrip()">
-          Create Trip
-        </button>
-
-        <button class="cancel-btn">
-          Cancel
-        </button>
-
-      </div>
-
-    </div>
-
-    <!-- TIPS -->
-
-    <div class="tips">
-
-      <h3>💡 Travel Planning Tips</h3>
-
-      <ul>
-
-        <li>
-          Plan your destinations according to weather and season.
-        </li>
-
-        <li>
-          Set a realistic travel budget including hotels and transport.
-        </li>
-
-        <li>
-          Keep emergency funds for unexpected situations.
-        </li>
-
-        <li>
-          Add activities and sightseeing plans early for better organization.
-        </li>
-
-      </ul>
-
-    </div>
-
-  </div>
-
-  <!-- JAVASCRIPT -->
-
-  <script src="backend/traveloop.js"></script>
-  <script>
-
-    async function createTrip(){
-      const name = document.getElementById('tripName').value.trim();
-      const destination = document.getElementById('tripDestination').value.trim();
-      const start_date = document.getElementById('tripStartDate').value;
-      const end_date = document.getElementById('tripEndDate').value;
-      const travelersLabel = document.getElementById('tripTravelers').value;
-      const budgetValue = document.getElementById('tripBudget').value;
-      const description = document.getElementById('tripDescription').value.trim();
-
-      if (!name) {
-        return showNotification('Please enter a trip name.', false);
-      }
-
-      const travelers = travelersLabel.includes('4') ? 4 : parseInt(travelersLabel, 10) || 1;
-
-      try {
-        await TravelLoopAPI.trips.create({
-          name,
-          destination,
-          start_date,
-          end_date,
-          travelers,
-          budget: budgetValue ? parseFloat(budgetValue) : 0,
-          description,
-          cover_photo: null,
-          status: 'Upcoming'
-        });
-
-        showNotification('Trip created successfully. Redirecting to My Trips...');
-        window.location.href = 'My-Trip.html';
-      } catch (error) {
-        showNotification(error.message, false);
-      }
+    if (!data.success) {
+      alert(data.message);
+      return;
     }
 
-  </script>
+    const trips = data.trips;
+    const container = document.getElementById("tripContainer");
+
+    container.innerHTML = "";
+
+    if (!trips || trips.length === 0) {
+      container.innerHTML = "<div class='empty'>No trips yet ✈</div>";
+      return;
+    }
+
+    trips.forEach(trip => {
+
+      const days = Math.ceil(
+        (new Date(trip.end_date) - new Date(trip.start_date)) /
+        (1000 * 60 * 60 * 24)
+      );
+
+      const card = `
+        <div class="trip-card">
+          <img src="${trip.cover_photo || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'}">
+
+          <div class="trip-content">
+            <h3>${trip.name}</h3>
+
+            <p>${days} Days • ${trip.destination || "Unknown"}</p>
+
+            <div class="budget">Budget: $${trip.budget}</div>
+
+            <div class="actions">
+              <button class="delete-btn" onclick="deleteTrip(${trip.id})">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.innerHTML += card;
+    });
+
+  } catch (err) {
+    console.error(err);
+    alert("Error loading trips");
+  }
+}
+
+
+// ❌ DELETE TRIP
+async function deleteTrip(id) {
+
+  if (!confirm("Are you sure you want to delete this trip?")) return;
+
+  const res = await fetch(BASE_URL + "/trips.php?action=delete", {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      trip_id: id
+    })
+  });
+
+  const data = await res.json();
+  alert(data.message);
+
+  loadTrips();
+}
+
+
+// 🚀 INIT
+document.addEventListener("DOMContentLoaded", loadTrips);
+</script>
 
 </body>
 </html>

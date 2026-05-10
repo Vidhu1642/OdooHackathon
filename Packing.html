@@ -727,32 +727,92 @@ Connected with Budget Planner
 
   <!-- JAVASCRIPT -->
 
+  <script src="backend/traveloop.js"></script>
   <script>
 
+    const packingItems = {
+      clothing: [],
+      documents: [],
+      electronics: [],
+      toiletries: [],
+      other: []
+    };
+
     function togglePacked(checkbox){
-
-      const itemText =
-      checkbox.nextElementSibling;
-
+      const itemText = checkbox.nextElementSibling;
       if(checkbox.checked){
-
         itemText.classList.add("packed");
-
       }else{
-
         itemText.classList.remove("packed");
+      }
+      savePacking();
+    }
 
+    function addPackingItem(category){
+      const container = document.querySelector(`[data-category="${category}"]`);
+      const input = container.querySelector('input[type="text"]');
+      const itemText = input.value.trim();
+
+      if (!itemText) {
+        showNotification('Enter an item name', false);
+        return;
       }
 
+      const checkItem = document.createElement('div');
+      checkItem.className = 'check-item';
+      checkItem.innerHTML = `
+        <div class="item-left">
+          <input type="checkbox" onchange="togglePacked(this)">
+          <span class="item-name">${itemText}</span>
+        </div>
+        <button class="delete-btn" onclick="deletePackingItem(this, '${category}')">Delete</button>`;
+      
+      container.insertBefore(checkItem, input.parentElement);
+      input.value = '';
+      packingItems[category].push(itemText);
+      updateCategoryCount(category);
+      savePacking();
+    }
+
+    function deletePackingItem(btn, category){
+      const itemText = btn.parentElement.querySelector('.item-name').textContent;
+      packingItems[category] = packingItems[category].filter(item => item !== itemText);
+      btn.parentElement.remove();
+      updateCategoryCount(category);
+      savePacking();
+    }
+
+    function updateCategoryCount(category){
+      const container = document.querySelector(`[data-category="${category}"]`);
+      const count = container.querySelectorAll('.check-item').length;
+      container.querySelector('.category-count').textContent = `${count} Items`;
+    }
+
+    function savePacking(){
+      localStorage.setItem('packingItems', JSON.stringify(packingItems));
+    }
+
+    function loadPacking(){
+      const saved = localStorage.getItem('packingItems');
+      if (saved) {
+        Object.assign(packingItems, JSON.parse(saved));
+      }
     }
 
     function resetChecklist(){
-
-      alert(
-        "Checklist Reset Successfully!"
-      );
-
+      if (confirm('Reset all packing items? This cannot be undone.')) {
+        packingItems.clothing = [];
+        packingItems.documents = [];
+        packingItems.electronics = [];
+        packingItems.toiletries = [];
+        packingItems.other = [];
+        localStorage.removeItem('packingItems');
+        showNotification('Checklist reset successfully!');
+        location.reload();
+      }
     }
+
+    document.addEventListener('DOMContentLoaded', loadPacking);
 
   </script>
 
