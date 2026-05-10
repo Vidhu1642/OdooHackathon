@@ -14,11 +14,22 @@
   <div id="app"></div>
 
   <script src="backend/traveloop.js"></script>
+  <script src="frontend/js/app.js"></script>
   <script src="frontend/js/components.js"></script>
   <script>
     const dashboardPage = {
       async render() {
-        const user = app.state.user;
+        // Ensure we check auth status from the backend before rendering
+        try {
+          if (!app.state.user) {
+            const res = await TravelLoopAPI.auth.status();
+            app.state.user = res.user;
+          }
+        } catch (err) {
+          app.state.user = null;
+        }
+        
+        const user = app.state.user || { full_name: 'Traveler' };
         if (!user) {
           window.location.href = 'index.html';
           return;
@@ -28,7 +39,7 @@
           ${PageHeader({
           title: `Welcome back, ${escapeHtml(user.full_name || 'Traveler')}! 👋`,
           subtitle: 'Ready for your next adventure?',
-          actions: `<button class="btn btn-primary" onclick="app.navigate('/trips/new')">+ Create Trip</button>`
+          actions: `<button class="btn btn-primary" onclick="window.location.href='Create-Trip.html'">+ Create Trip</button>`
         })}
           
           <div id="dashboard-stats" class="stats-grid"></div>
@@ -87,7 +98,7 @@
               <div class="empty-state">
                 <h3>🌍 No trips yet</h3>
                 <p>Create your first trip to get started!</p>
-                <button class="btn btn-primary" onclick="app.navigate('/trips/new')">Create Trip</button>
+                <button class="btn btn-primary" onclick="window.location.href='Create-Trip.html'">Create Trip</button>
               </div>
             `;
           } else {
@@ -104,7 +115,11 @@
       }
     };
 
-    dashboardPage.render();
+    // Register the exact current path in app.js so it routes correctly (even inside XAMPP)
+    app.registerRoute(window.location.pathname, dashboardPage.render.bind(dashboardPage));
+    
+    // Execute the route explicitly when the page loads
+    document.addEventListener('DOMContentLoaded', () => app.handleRoute());
   </script>
 </body>
 

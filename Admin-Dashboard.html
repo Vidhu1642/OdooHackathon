@@ -294,11 +294,11 @@ Traveloop Hackathon Project
   <div class="sidebar">
     <div class="logo">Traveloop Admin</div>
     <ul class="menu">
-      <li><a href="Dashboard.html">🏠 Dashboard</a></li>
-      <li><a href="Create-Trip.html">✈ Create Trip</a></li>
-      <li><a href="My-Trip.html">🧳 My Trips</a></li>
-      <li><a href="Admin-Dashboard.html">📊 Admin Analytics</a></li>
-      <li><a href="index.html">🚪 Logout</a></li>
+      <li><a href="/" data-link>🏠 Dashboard</a></li>
+      <li><a href="/create-trip" data-link>✈ Create Trip</a></li>
+      <li><a href="/my-trips" data-link>🧳 My Trips</a></li>
+      <li><a href="/admin" data-link>📊 Admin Analytics</a></li>
+      <li><a href="/logout" data-link>🚪 Logout</a></li>
     </ul>
   </div>
 
@@ -318,76 +318,13 @@ Traveloop Hackathon Project
       </div>
     </div>
 
-    <!-- STATS -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <h3>Total Users</h3>
-        <h2 id="adminUsersValue">...</h2>
-        <div class="growth">+18% This Month</div>
-      </div>
-      <div class="stat-card">
-        <h3>Total Trips</h3>
-        <h2 id="adminTripsValue">...</h2>
-        <div class="growth">+12% This Month</div>
-      </div>
-      <div class="stat-card">
-        <h3>Active Users</h3>
-        <h2 id="adminActiveUsersValue">...</h2>
-        <div class="growth">+9% This Week</div>
-      </div>
-      <div class="stat-card">
-        <h3>Shared Itineraries</h3>
-        <h2 id="adminItinerariesValue">...</h2>
-        <div class="growth">+25% Growth</div>
-      </div>
-    </div>
-
-    <!-- ANALYTICS -->
-    <div class="analytics-grid">
-      <div class="chart-card">
-        <h2>User Engagement Analytics</h2>
-        <div class="chart-placeholder">
-          📈 Analytics Chart Placeholder
-          <p style="margin-top:15px; color:#6b7280; font-size:15px;">
-            Monthly active users and trip creation trends
-          </p>
-        </div>
-      </div>
-
-      <div class="chart-card">
-        <h2>Popular Destinations 🌍</h2>
-        <div class="destination-list" id="adminDestinationsList">
-            <!-- Dynamic Content -->
-            <p style="padding:20px; color:#6b7280;">Loading destinations...</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- USERS TABLE -->
-    <div class="table-card">
-      <h2>User Management 👥</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>User</th>
-            <th>Email</th>
-            <th>Trips</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="adminUserTableBody">
-            <!-- Dynamic content will be injected here -->
-            <tr>
-                <td colspan="5" style="text-align:center; padding:40px; color:#6b7280;">Loading user data...</td>
-            </tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- SPA DYNAMIC MOUNT POINT -->
+    <div id="app"></div>
   </div>
 
   <!-- Backend API Script -->
   <script src="backend/traveloop.js"></script>
+  <script src="frontend/js/app.js"></script>
   
   <script>
     /**
@@ -491,7 +428,9 @@ Traveloop Hackathon Project
     }
 
     // Run when the page is ready
-    document.addEventListener('DOMContentLoaded', loadAdminStats);
+    document.addEventListener('DOMContentLoaded', () => {
+      app.navigate('/admin', true);
+    });
   </script>
 </body>
 </html>

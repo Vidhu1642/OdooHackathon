@@ -10,22 +10,22 @@ function Sidebar({ active = '' } = {}) {
     <aside class="sidebar">
       <div class="sidebar-logo">✈ Traveloop</div>
       <nav class="sidebar-nav">
-        <a href="/dashboard.html" data-link class="${isActive('dashboard')}">
+        <a href="Dashboard.html" class="${isActive('dashboard')}">
           <span class="nav-icon">🏠</span> Dashboard
         </a>
-        <a href="/My-Trip.html" data-link class="${isActive('trips')}">
+        <a href="My-Trip.html" class="${isActive('trips')}">
           <span class="nav-icon">📍</span> My Trips
         </a>
-        <a href="/Search.html" data-link class="${isActive('search')}">
+        <a href="Search.html" class="${isActive('search')}">
           <span class="nav-icon">🔍</span> Search
         </a>
-        <a href="/Profile.html" data-link class="${isActive('profile')}">
+        <a href="Profile.html" class="${isActive('profile')}">
           <span class="nav-icon">👤</span> Profile
         </a>
-        <a href="/Activity-Search.html" data-link class="${isActive('activities')}">
+        <a href="Activity-Search.html" class="${isActive('activities')}">
           <span class="nav-icon">🎯</span> Activities
         </a>
-        <a href="/Trip-Notes.html" data-link class="${isActive('notes')}">
+        <a href="Trip-Notes.html" class="${isActive('notes')}">
           <span class="nav-icon">📝</span> Trip Notes
         </a>
         <a href="#" onclick="logout()">
@@ -100,8 +100,8 @@ function TripCard(trip) {
           <span>💰 ${formatMoney(trip.budget)}</span>
         </div>
         <div class="trip-card-actions">
-          <button class="btn btn-primary" onclick="app.navigate('/trip/${trip.id}')">View</button>
-          <button class="btn btn-warning" onclick="app.navigate('/trip/${trip.id}/edit')">Edit</button>
+          <button class="btn btn-primary" onclick="window.location.href='Itinerary-View.html?trip_id=${trip.id}'">View</button>
+          <button class="btn btn-warning" onclick="window.location.href='Itinerary.html?trip_id=${trip.id}'">Edit</button>
           <button class="btn btn-danger" onclick="deleteTrip(${trip.id})">Delete</button>
         </div>
       </div>
