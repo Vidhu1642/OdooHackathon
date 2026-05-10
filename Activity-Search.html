@@ -381,11 +381,12 @@ Connected with City Search
       <div class="search-grid">
 
         <input 
+          id="activitySearchQuery"
           type="text"
           placeholder="Search activities..."
         >
 
-        <select>
+        <select id="activityCategorySelect">
 
           <option>All Categories</option>
           <option>Adventure</option>
@@ -679,22 +680,51 @@ Connected with City Search
 
   <!-- JAVASCRIPT -->
 
+  <script src="backend/traveloop.js"></script>
   <script>
 
-    function searchActivity(){
+    async function searchActivity(){
+      const query = document.getElementById('activitySearchQuery').value.trim();
+      if (!query) {
+        return showNotification('Enter an activity to search for.', false);
+      }
 
-      alert(
-        "Searching Activities..."
-      );
+      try {
+        const response = await TravelLoopAPI.search.query(query);
+        const grid = document.querySelector('.activity-grid');
+        grid.innerHTML = '';
 
+        if (!response.results.activities || response.results.activities.length === 0) {
+          grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#6b7280;">No activities found.</div>';
+          return;
+        }
+
+        response.results.activities.forEach(activity => {
+          const card = document.createElement('div');
+          card.className = 'activity-card';
+          card.innerHTML = `
+            <div class="activity-image">
+              <img src="https://images.unsplash.com/photo-1519817650390-64a93db511aa" />
+              <div class="activity-category">${activity.category || 'Activity'}</div>
+            </div>
+            <div class="activity-content">
+              <h2>${activity.name}</h2>
+              <p>${activity.description || 'Enjoy this unique experience.'}</p>
+              <div class="activity-details">
+                <span>${activity.location || 'Unknown destination'}</span>
+                <span>Budget: $${parseFloat(activity.cost || 0).toFixed(2)}</span>
+              </div>
+              <button class="add-btn" onclick="addActivity(${JSON.stringify(activity.name)})">Add Activity</button>
+            </div>`;
+          grid.appendChild(card);
+        });
+      } catch (error) {
+        showNotification(error.message, false);
+      }
     }
 
     function addActivity(activity){
-
-      alert(
-        activity + " added to itinerary!"
-      );
-
+      showNotification(activity + ' added to itinerary!');
     }
 
   </script>

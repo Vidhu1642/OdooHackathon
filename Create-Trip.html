@@ -349,6 +349,7 @@ Connected with Dashboard
           <label>Trip Name</label>
 
           <input 
+            id="tripName"
             type="text"
             placeholder="Enter trip name"
           >
@@ -362,6 +363,7 @@ Connected with Dashboard
           <label>Main Destination</label>
 
           <input 
+            id="tripDestination"
             type="text"
             placeholder="Enter destination"
           >
@@ -374,7 +376,7 @@ Connected with Dashboard
 
           <label>Start Date</label>
 
-          <input type="date">
+          <input id="tripStartDate" type="date">
 
         </div>
 
@@ -384,7 +386,7 @@ Connected with Dashboard
 
           <label>End Date</label>
 
-          <input type="date">
+          <input id="tripEndDate" type="date">
 
         </div>
 
@@ -394,7 +396,7 @@ Connected with Dashboard
 
           <label>Travelers</label>
 
-          <select>
+          <select id="tripTravelers">
 
             <option>1 Person</option>
             <option>2 People</option>
@@ -412,6 +414,7 @@ Connected with Dashboard
           <label>Estimated Budget</label>
 
           <input 
+            id="tripBudget"
             type="number"
             placeholder="Enter estimated budget"
           >
@@ -425,6 +428,7 @@ Connected with Dashboard
           <label>Trip Description</label>
 
           <textarea 
+            id="tripDescription"
             placeholder="Describe your trip plan, activities, goals, and travel preferences..."
           ></textarea>
 
@@ -445,6 +449,7 @@ Connected with Dashboard
             </p>
 
             <input 
+              id="tripCoverPhoto"
               type="file"
               style="margin-top:20px;"
             >
@@ -503,17 +508,42 @@ Connected with Dashboard
 
   <!-- JAVASCRIPT -->
 
+  <script src="backend/traveloop.js"></script>
   <script>
 
-    function createTrip(){
+    async function createTrip(){
+      const name = document.getElementById('tripName').value.trim();
+      const destination = document.getElementById('tripDestination').value.trim();
+      const start_date = document.getElementById('tripStartDate').value;
+      const end_date = document.getElementById('tripEndDate').value;
+      const travelersLabel = document.getElementById('tripTravelers').value;
+      const budgetValue = document.getElementById('tripBudget').value;
+      const description = document.getElementById('tripDescription').value.trim();
 
-      alert(
-        "Trip Created Successfully! Redirecting to My Trips..."
-      );
+      if (!name) {
+        return showNotification('Please enter a trip name.', false);
+      }
 
-      // Example redirect
-      // window.location.href = "mytrips.html";
+      const travelers = travelersLabel.includes('4') ? 4 : parseInt(travelersLabel, 10) || 1;
 
+      try {
+        await TravelLoopAPI.trips.create({
+          name,
+          destination,
+          start_date,
+          end_date,
+          travelers,
+          budget: budgetValue ? parseFloat(budgetValue) : 0,
+          description,
+          cover_photo: null,
+          status: 'Upcoming'
+        });
+
+        showNotification('Trip created successfully. Redirecting to My Trips...');
+        window.location.href = 'My-Trip.html';
+      } catch (error) {
+        showNotification(error.message, false);
+      }
     }
 
   </script>

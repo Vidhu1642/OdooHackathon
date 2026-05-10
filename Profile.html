@@ -491,6 +491,7 @@ Connected with Shared Itinerary
               <label>Full Name</label>
 
               <input 
+                id="profileFullName"
                 type="text"
                 value="Alex Johnson"
               >
@@ -502,8 +503,10 @@ Connected with Shared Itinerary
               <label>Email Address</label>
 
               <input 
+                id="profileEmail"
                 type="email"
                 value="alex@email.com"
+                disabled
               >
 
             </div>
@@ -513,6 +516,7 @@ Connected with Shared Itinerary
               <label>Phone Number</label>
 
               <input 
+                id="profilePhone"
                 type="text"
                 value="+1 987654321"
               >
@@ -523,7 +527,7 @@ Connected with Shared Itinerary
 
               <label>Language</label>
 
-              <select>
+              <select id="profileLanguage">
 
                 <option>English</option>
                 <option>French</option>
@@ -537,9 +541,7 @@ Connected with Shared Itinerary
 
               <label>Bio</label>
 
-              <textarea>
-Passionate traveler exploring cultures, adventures, and unforgettable experiences around the world.
-              </textarea>
+              <textarea id="profileBio">Passionate traveler exploring cultures, adventures, and unforgettable experiences around the world.</textarea>
 
             </div>
 
@@ -571,7 +573,7 @@ Passionate traveler exploring cultures, adventures, and unforgettable experience
 
               <label class="switch">
 
-                <input type="checkbox" checked>
+                <input id="profilePublicProfile" type="checkbox" checked>
 
                 <span class="slider"></span>
 
@@ -595,7 +597,7 @@ Passionate traveler exploring cultures, adventures, and unforgettable experience
 
               <label class="switch">
 
-                <input type="checkbox" checked>
+                <input id="profileEmailNotifications" type="checkbox" checked>
 
                 <span class="slider"></span>
 
@@ -619,7 +621,7 @@ Passionate traveler exploring cultures, adventures, and unforgettable experience
 
               <label class="switch">
 
-                <input type="checkbox">
+                <input id="profileDarkMode" type="checkbox">
 
                 <span class="slider"></span>
 
@@ -662,31 +664,60 @@ Passionate traveler exploring cultures, adventures, and unforgettable experience
 
   <!-- JAVASCRIPT -->
 
+  <script src="backend/traveloop.js"></script>
   <script>
 
-    function saveSettings(){
+    document.addEventListener('DOMContentLoaded', loadProfile);
 
-      alert(
-        "Profile Settings Saved Successfully!"
-      );
+    async function loadProfile() {
+      try {
+        const response = await TravelLoopAPI.profile.load();
+        const profile = response.profile;
 
+        document.getElementById('profileFullName').value = profile.full_name || '';
+        document.getElementById('profileEmail').value = profile.email || '';
+        document.getElementById('profilePhone').value = profile.phone || '';
+        document.getElementById('profileLanguage').value = profile.language || 'English';
+        document.getElementById('profileBio').value = profile.bio || '';
+        document.getElementById('profilePublicProfile').checked = Boolean(profile.public_profile);
+        document.getElementById('profileEmailNotifications').checked = Boolean(profile.email_notifications);
+        document.getElementById('profileDarkMode').checked = Boolean(profile.dark_mode);
+      } catch (error) {
+        showNotification(error.message, false);
+      }
     }
 
-    function deleteAccount(){
+    async function saveSettings(){
+      try {
+        await TravelLoopAPI.profile.update({
+          full_name: document.getElementById('profileFullName').value.trim(),
+          phone: document.getElementById('profilePhone').value.trim(),
+          language: document.getElementById('profileLanguage').value,
+          bio: document.getElementById('profileBio').value.trim(),
+          public_profile: document.getElementById('profilePublicProfile').checked ? 1 : 0,
+          email_notifications: document.getElementById('profileEmailNotifications').checked ? 1 : 0,
+          dark_mode: document.getElementById('profileDarkMode').checked ? 1 : 0,
+        });
 
-      const confirmDelete =
-      confirm(
-        "Are you sure you want to delete your account?"
-      );
+        showNotification('Profile Settings Saved Successfully!');
+      } catch (error) {
+        showNotification(error.message, false);
+      }
+    }
 
-      if(confirmDelete){
-
-        alert(
-          "Account Deleted Successfully!"
-        );
-
+    async function deleteAccount(){
+      const confirmDelete = confirm('Are you sure you want to delete your account?');
+      if (!confirmDelete) {
+        return;
       }
 
+      try {
+        await TravelLoopAPI.profile.delete();
+        showNotification('Account Deleted Successfully!');
+        window.location.href = 'index.html';
+      } catch (error) {
+        showNotification(error.message, false);
+      }
     }
 
   </script>

@@ -713,30 +713,52 @@ Connected with My Trips Screen
 
   <!-- JAVASCRIPT -->
 
+  <script src="backend/traveloop.js"></script>
   <script>
 
-    function saveItinerary(){
+    async function saveItinerary(){
+      const cityCards = document.querySelectorAll('.city-card');
+      const stops = Array.from(cityCards).map(card => {
+        const cityTitle = card.querySelector('.city-header h2')?.textContent.trim() || '';
+        const dates = card.querySelectorAll('.date-row input[type="date"]');
+        const arrival_date = dates[0]?.value || null;
+        const departure_date = dates[1]?.value || null;
+        const activities = Array.from(card.querySelectorAll('.activity-card')).map(activity => {
+          return {
+            title: activity.querySelector('h4')?.textContent.trim() || '',
+            description: activity.querySelector('p')?.textContent.trim() || '',
+            duration: activity.querySelector('.activity-info span')?.textContent.trim() || '',
+            cost: parseFloat(activity.querySelector('.activity-cost')?.textContent.replace(/[^0-9.]/g, '') || 0) || 0
+          };
+        });
 
-      alert(
-        "Itinerary Saved Successfully!"
-      );
+        return {
+          city: cityTitle,
+          arrival_date,
+          departure_date,
+          activities
+        };
+      });
 
+      try {
+        await TravelLoopAPI.itinerary.save({
+          trip_id: null,
+          title: 'My Travel Itinerary',
+          summary: 'Saved itinerary from the planner.',
+          stops
+        });
+        showNotification('Itinerary saved successfully.');
+      } catch (error) {
+        showNotification(error.message, false);
+      }
     }
 
     function addStop(){
-
-      alert(
-        "Add Stop Feature Clicked!"
-      );
-
+      showNotification('Add Stop Feature Clicked!');
     }
 
     function addActivity(){
-
-      alert(
-        "Add Activity Feature Clicked!"
-      );
-
+      showNotification('Add Activity Feature Clicked!');
     }
 
   </script>

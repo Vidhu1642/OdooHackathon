@@ -389,6 +389,28 @@ Connected with Activity Search
 
     </div>
 
+    <div class="budget-actions" style="margin:30px 0 15px; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:15px;">
+      <label style="display:flex;flex-direction:column;gap:8px;">
+        Trip
+        <select id="budgetTripSelect" onchange="fetchBudget()">
+          <option value="">Select trip</option>
+        </select>
+      </label>
+      <label style="display:flex;flex-direction:column;gap:8px;">
+        Total Budget
+        <input id="budgetTotalInput" type="number" placeholder="Total budget" />
+      </label>
+      <label style="display:flex;flex-direction:column;gap:8px;">
+        Expenses
+        <input id="budgetExpensesInput" type="number" placeholder="Total expenses" />
+      </label>
+      <label style="display:flex;flex-direction:column;gap:8px;">
+        Notes
+        <textarea id="budgetNotesInput" rows="1" placeholder="Budget notes"></textarea>
+      </label>
+      <button class="export-btn" style="align-self:end;" onclick="saveBudget()">Save Budget</button>
+    </div>
+
     <!-- SUMMARY -->
 
     <div class="summary-grid">
@@ -397,7 +419,7 @@ Connected with Activity Search
 
         <h3>Total Budget</h3>
 
-        <h2 class="blue">$2500</h2>
+        <h2 class="blue" id="totalBudgetValue">$2500</h2>
 
       </div>
 
@@ -405,7 +427,7 @@ Connected with Activity Search
 
         <h3>Total Expenses</h3>
 
-        <h2 class="green">$1980</h2>
+        <h2 class="green" id="totalExpenseValue">$1980</h2>
 
       </div>
 
@@ -413,7 +435,7 @@ Connected with Activity Search
 
         <h3>Remaining Budget</h3>
 
-        <h2 class="green">$520</h2>
+        <h2 class="green" id="remainingBudgetValue">$520</h2>
 
       </div>
 
@@ -421,7 +443,7 @@ Connected with Activity Search
 
         <h3>Average Per Day</h3>
 
-        <h2 class="red">$165</h2>
+        <h2 class="red" id="avgPerDayValue">$165</h2>
 
       </div>
 
@@ -634,15 +656,103 @@ Connected with Activity Search
 
   <!-- JAVASCRIPT -->
 
+  <script src="backend/traveloop.js"></script>
   <script>
 
-    function exportBudget(){
-
-      alert(
-        "Budget Report Exported Successfully!"
-      );
-
+    async function initializeBudgetPage(){
+      const tripSelect = document.getElementById('budgetTripSelect');
+      try {
+        const response = await TravelLoopAPI.trips.list();
+        if (response.trips && response.trips.length) {
+          response.trips.forEach(trip => {
+            const option = document.createElement('option');
+            option.value = trip.id;
+            option.textContent = `${trip.name} (${trip.destination || 'Trip'})`;
+            tripSelect.appendChild(option);
+          });
+          if (!tripSelect.value) {
+            tripSelect.value = response.trips[0].id;
+          }
+          fetchBudget();
+        } else {
+          showNotification('No trips available to load budget data.', false);
+        }
+      } catch (error) {
+        showNotification(error.message, false);
+      }
     }
+
+    async function fetchBudget(){
+      const tripId = document.getElementById('budgetTripSelect').value;
+      if (!tripId) {
+        return;
+      }
+
+      try {
+        const response = await TravelLoopAPI.budget.get(tripId);
+        if (response.budget) {
+          const budget = response.budget;
+          document.getElementById('budgetTotalInput').value = budget.total_budget || '';
+          document.getElementById('budgetExpensesInput').value = budget.spent_amount || '';
+          document.getElementById('budgetNotesInput').value = budget.notes || '';
+
+          const total = Number(budget.total_budget || 0);
+          const expenses = Number(budget.spent_amount || 0);
+          const remaining = total - expenses;
+          const avgPerDay = remaining > 0 ? (remaining / 7).toFixed(2) : '0.00';
+
+          document.getElementById('totalBudgetValue').textContent = `$${total.toFixed(2)}`;
+          document.getElementById('totalExpenseValue').textContent = `$${expenses.toFixed(2)}`;
+          document.getElementById('remainingBudgetValue').textContent = `$${remaining.toFixed(2)}`;
+          document.getElementById('avgPerDayValue').textContent = `$${avgPerDay}`;
+        } else {
+          showNotification('No budget saved for this trip. Enter values and click Save.', true);
+          document.getElementById('budgetTotalInput').value = '';
+          document.getElementById('budgetExpensesInput').value = '';
+          document.getElementById('budgetNotesInput').value = '';
+          document.getElementById('totalBudgetValue').textContent = '$0.00';
+          document.getElementById('totalExpenseValue').textContent = '$0.00';
+          document.getElementById('remainingBudgetValue').textContent = '$0.00';
+          document.getElementById('avgPerDayValue').textContent = '$0.00';
+        }
+      } catch (error) {
+        showNotification(error.message, false);
+      }
+    }
+
+    async function saveBudget(){
+      const tripId = document.getElementById('budgetTripSelect').value;
+      const totalBudget = Number(document.getElementById('budgetTotalInput').value || 0);
+      const spentAmount = Number(document.getElementById('budgetExpensesInput').value || 0);
+      const notes = document.getElementById('budgetNotesInput').value.trim();
+
+      if (!tripId) {
+        return showNotification('Select a trip before saving budget.', false);
+      }
+
+      try {
+        const response = await TravelLoopAPI.budget.save({
+          trip_id: tripId,
+          total_budget: totalBudget,
+          spent_amount: spentAmount,
+          notes,
+        });
+        if (response.success) {
+          showNotification('Budget saved successfully.');
+          fetchBudget();
+        } else {
+          showNotification(response.message || 'Unable to save budget.', false);
+        }
+      } catch (error) {
+        showNotification(error.message, false);
+      }
+    }
+
+    function exportBudget(){
+      showNotification('Budget report exported successfully.');
+    }
+
+    document.addEventListener('DOMContentLoaded', initializeBudgetPage);
 
   </script>
 
