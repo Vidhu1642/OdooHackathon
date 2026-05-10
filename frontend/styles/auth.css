@@ -1,0 +1,171 @@
+/* ========================================
+   AUTH PAGES STYLES
+   ======================================== */
+
+.auth-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 1000px;
+}
+
+.auth-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: white;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+@media (max-width: 768px) {
+  .auth-split {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-brand {
+    display: none;
+  }
+}
+
+/* Brand Panel */
+.auth-brand {
+  background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+  color: white;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-brand h1 {
+  font-size: 42px;
+  margin-bottom: 20px;
+}
+
+.auth-brand p {
+  font-size: 18px;
+  opacity: 0.9;
+  line-height: 1.7;
+  margin-bottom: 40px;
+}
+
+.auth-features {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-feature {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+}
+
+/* Form Container */
+.auth-form-container {
+  padding: 50px 40px;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 30px;
+  background: var(--gray-100);
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gray-500);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.auth-tab.active {
+  background: white;
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.auth-form {
+  display: none;
+}
+
+.auth-form.active {
+  display: block;
+}
+
+.auth-form h2 {
+  font-size: 28px;
+  margin-bottom: 24px;
+  color: var(--gray-900);
+}
+
+.form-links {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.form-links a {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.social-login {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.social-login p {
+  color: var(--gray-500);
+  margin-bottom: 16px;
+}
+
+.social-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-google,
+.btn-facebook {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-google {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-facebook {
+  background: #1877f2;
+  color: white;
+}
+
+.btn-google:hover,
+.btn-facebook:hover {
+  opacity: 0.9;
+}

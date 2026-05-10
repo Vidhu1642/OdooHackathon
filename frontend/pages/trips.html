@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Trips - Traveloop</title>
+  <link rel="stylesheet" href="frontend/styles/main.css" />
+  <link rel="stylesheet" href="frontend/styles/layout.css" />
+</head>
+
+<body>
+  <div id="app"></div>
+
+  <script src="backend/traveloop.js"></script>
+  <script src="frontend/js/components.js"></script>
+  <script>
+    const tripsPage = {
+      filter: {
+        search: '',
+        status: 'all'
+      },
+
+      async render() {
+        if (!app.state.user) {
+          window.location.href = 'index.html';
+          return;
+        }
+
+        document.getElementById('app').innerHTML = MainLayout(`
+          ${PageHeader({
+          title: 'My Trips ✈',
+          subtitle: 'Manage and view all your travel adventures',
+          actions: `<button class="btn btn-primary" onclick="showCreateModal()">+ Create New Trip</button>`
+        })}
+          
+          <div class="trips-filters">
+            <input type="text" id="searchInput" placeholder="Search trips..." 
+                   value="${escapeHtml(this.filter.search)}" oninput="tripsPage.handleSearch(this.value)"/>
+            <select id="statusFilter" onchange="tripsPage.handleStatusFilter(this.value)">
+              <option value="all" ${this.filter.status === 'all' ? 'selected' : ''}>All Status</option>
+              <option value="Upcoming" ${this.filter.status === 'Upcoming' ? 'selected' : ''}>Upcoming</option>
+              <option value="Completed" ${this.filter.status === 'Completed' ? 'selected' : ''}>Completed</option>
+              <option value="Ongoing" ${this.filter.status === 'Ongoing' ? 'selected' : ''}>Ongoing</option>
+            </select>
+          </div>
+          
+          <div id="tripsContainer"></div>
+        `, 'trips');
+
+        await this.loadTrips();
+      },
+
+      async loadTrips() {
+        const container = document.getElementById('tripsContainer');
+        container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+        try {
+          const res = await TravelLoopAPI.trips.list();
+          let trips = res.trips || [];
+
+          // Apply filters
+          if (this.filter.search) {
+            const q = this.filter.search.toLowerCase();
+            trips = trips.filter(t =>
+              t.name?.toLowerCase().includes(q) ||
+              t.destination?.toLowerCase().includes(q)
+            );
+          }
+          if (this.filter.status !== 'all') {
+            trips = trips.filter(t => t.status === this.filter.status);
+          }
+
+          if (trips.length === 0) {
+            container.innerHTML = `
+              <div class="empty-state">
+                <h3>🌍 No trips found</h3>
+                <p>${this.filter.search || this.filter.status !== 'all'
+                ? 'Try adjusting your filters'
+                : 'Create your first trip to get started!'}</p>
+                <button class="btn btn-primary" onclick="showCreateModal()">Create Trip</button>
+              </div>
+            `;
+          } else {
+            container.innerHTML = `<div class="grid grid-2">${trips.map(t => TripCard(t)).join('')}</div>`;
+          }
+        } catch (err) {
+          container.innerHTML = `<div class="empty-state"><p>Error: ${escapeHtml(err.message)}</p></div>`;
+        }
+      },
+
+      handleSearch(value) {
+        this.filter.search = value;
+        this.loadTrips();
+      },
+
+      handleStatusFilter(value) {
+        this.filter.status = value;
+        this.loadTrips();
+      }
+    };
+
+    // Create Trip Modal
+    function showCreateModal() {
+      const modal = Modal({
+        id: 'createTrip',
+        title: 'Create New Trip',
+        content: `
+          <form id="createTripForm">
+            <div class="form-group">
+              <label>Trip Name</label>
+              <input type="text" id="tripName" placeholder="Summer Vacation 2024" required/>
+            </div>
+            <div class="form-group">
+              <label>Destination</label>
+              <input type="text" id="tripDestination" placeholder="Paris, France" required/>
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea id="tripDescription" placeholder="Tell us about your trip..." rows="3"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Start Date</label>
+                <input type="date" id="tripStartDate"/>
+              </div>
+              <div class="form-group">
+                <label>End Date</label>
+                <input type="date" id="tripEndDate"/>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Budget</label>
+                <input type="number" id="tripBudget" placeholder="5000" min="0"/>
+              </div>
+              <div class="form-group">
+                <label>Travelers</label>
+                <input type="number" id="tripTravelers" value="1" min="1"/>
+              </div>
+            </div>
+          </form>
+        `,
+        actions: `
+          <button class="btn btn-outline" onclick="closeModal('createTrip')">Cancel</button>
+          <button class="btn btn-primary" onclick="createTrip()">Create Trip</button>
+        `
+      });
+
+      document.body.insertAdjacentHTML('beforeend', modal);
+      openModal('createTrip');
+    }
+
+    async function createTrip() {
+      const data = {
+        name: document.getElementById('tripName').value.trim(),
+        destination: document.getElementById('tripDestination').value.trim(),
+        description: document.getElementById('tripDescription').value.trim(),
+        start_date: document.getElementById('tripStartDate').value,
+        end_date: document.getElementById('tripEndDate').value,
+        budget: Number(document.getElementById('tripBudget').value) || 0,
+        travelers: Number(document.getElementById('tripTravelers').value) || 1
+      };
+
+      if (!data.name || !data.destination) {
+        return showNotification('Please fill in required fields', false);
+      }
+
+      try {
+        await TravelLoopAPI.trips.create(data);
+        closeModal('createTrip');
+        document.querySelector('[id="createTrip-overlay"]')?.remove();
+        showNotification('Trip created successfully!');
+        tripsPage.loadTrips();
+      } catch (err) {
+        showNotification(err.message, false);
+      }
+    }
+
+    // Init
+    tripsPage.render();
+  </script>
+</body>
+
+</html>

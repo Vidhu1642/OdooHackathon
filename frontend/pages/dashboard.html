@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Traveloop</title>
+  <link rel="stylesheet" href="frontend/styles/main.css" />
+  <link rel="stylesheet" href="frontend/styles/layout.css" />
+  <link rel="stylesheet" href="frontend/styles/dashboard.css" />
+</head>
+
+<body>
+  <div id="app"></div>
+
+  <script src="backend/traveloop.js"></script>
+  <script src="frontend/js/components.js"></script>
+  <script>
+    const dashboardPage = {
+      async render() {
+        const user = app.state.user;
+        if (!user) {
+          window.location.href = 'index.html';
+          return;
+        }
+
+        document.getElementById('app').innerHTML = MainLayout(`
+          ${PageHeader({
+          title: `Welcome back, ${escapeHtml(user.full_name || 'Traveler')}! 👋`,
+          subtitle: 'Ready for your next adventure?',
+          actions: `<button class="btn btn-primary" onclick="app.navigate('/trips/new')">+ Create Trip</button>`
+        })}
+          
+          <div id="dashboard-stats" class="stats-grid"></div>
+          <div id="recent-trips" class="section"></div>
+        `, 'dashboard');
+
+        await this.loadDashboard();
+      },
+
+      async loadDashboard() {
+        try {
+          const [trips, stats] = await Promise.all([
+            TravelLoopAPI.trips.list(),
+            TravelLoopAPI.admin ? TravelLoopAPI.admin.stats() : Promise.resolve(null)
+          ]);
+
+          // Render stats
+          const statsEl = document.getElementById('dashboard-stats');
+          const tripList = trips.trips || [];
+
+          statsEl.innerHTML = `
+            <div class="stat-card">
+              <div class="stat-icon">📍</div>
+              <div class="stat-info">
+                <span class="stat-value">${tripList.length}</span>
+                <span class="stat-label">Total Trips</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">✈</div>
+              <div class="stat-info">
+                <span class="stat-value">${tripList.filter(t => t.status === 'Completed').length}</span>
+                <span class="stat-label">Completed</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📅</div>
+              <div class="stat-info">
+                <span class="stat-value">${tripList.filter(t => t.status === 'Upcoming').length}</span>
+                <span class="stat-label">Upcoming</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">💰</div>
+              <div class="stat-info">
+                <span class="stat-value">${formatMoney(tripList.reduce((sum, t) => sum + (t.budget || 0), 0))}</span>
+                <span class="stat-label">Total Budget</span>
+              </div>
+            </div>
+          `;
+
+          // Render recent trips
+          const recentEl = document.getElementById('recent-trips');
+          if (tripList.length === 0) {
+            recentEl.innerHTML = `
+              <div class="empty-state">
+                <h3>🌍 No trips yet</h3>
+                <p>Create your first trip to get started!</p>
+                <button class="btn btn-primary" onclick="app.navigate('/trips/new')">Create Trip</button>
+              </div>
+            `;
+          } else {
+            recentEl.innerHTML = `
+              <h2 class="section-title">Recent Trips</h2>
+              <div class="grid grid-2">
+                ${tripList.slice(0, 4).map(trip => TripCard(trip)).join('')}
+              </div>
+            `;
+          }
+        } catch (err) {
+          showNotification(err.message, false);
+        }
+      }
+    };
+
+    dashboardPage.render();
+  </script>
+</body>
+
+</html>

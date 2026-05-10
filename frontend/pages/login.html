@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Traveloop - Login</title>
+  <link rel="stylesheet" href="frontend/styles/main.css" />
+  <link rel="stylesheet" href="frontend/styles/auth.css" />
+</head>
+
+<body>
+  <div id="app" class="auth-page"></div>
+
+  <script src="backend/traveloop.js"></script>
+  <script src="frontend/js/components.js"></script>
+  <script>
+    const loginPage = {
+      render: () => {
+        document.getElementById('app').innerHTML = AuthLayout(`
+          <div class="auth-tabs">
+            <button class="auth-tab active" data-tab="login">Login</button>
+            <button class="auth-tab" data-tab="signup">Sign Up</button>
+          </div>
+          
+          <div id="login-form" class="auth-form active">
+            <h2>Welcome Back</h2>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="loginEmail" placeholder="Enter your email" required/>
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" id="loginPassword" placeholder="Enter password" required/>
+            </div>
+            <div class="form-links">
+              <a href="#">Forgot Password?</a>
+            </div>
+            <button class="btn btn-primary btn-block" onclick="handleLogin()">Login</button>
+            
+            <div class="social-login">
+              <p>Or continue with</p>
+              <div class="social-buttons">
+                <button class="btn-google" onclick="socialLogin('google')">Google</button>
+                <button class="btn-facebook" onclick="socialLogin('facebook')">Facebook</button>
+              </div>
+            </div>
+          </div>
+          
+          <div id="signup-form" class="auth-form">
+            <h2>Create Account</h2>
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="signupFullName" placeholder="Enter your full name" required/>
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="signupEmail" placeholder="Enter your email" required/>
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" id="signupPassword" placeholder="Create password" required/>
+            </div>
+            <div class="form-group">
+              <label>Confirm Password</label>
+              <input type="password" id="signupConfirmPassword" placeholder="Confirm password" required/>
+            </div>
+            <button class="btn btn-primary btn-block" onclick="handleSignup()">Create Account</button>
+          </div>
+        `);
+
+        // Tab switching
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+          tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+        });
+      }
+    };
+
+    function switchTab(tab) {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+      document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+      document.getElementById(`${tab}-form`).classList.add('active');
+    }
+
+    async function handleLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+
+      if (!email || !password) {
+        return showNotification('Please enter email and password', false);
+      }
+
+      try {
+        await TravelLoopAPI.auth.login(email, password);
+        showNotification('Login successful! Redirecting...');
+        window.location.href = 'My-Trip.html';
+      } catch (err) {
+        showNotification(err.message, false);
+      }
+    }
+
+    async function handleSignup() {
+      const fullName = document.getElementById('signupFullName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const password = document.getElementById('signupPassword').value.trim();
+      const confirmPassword = document.getElementById('signupConfirmPassword').value.trim();
+
+      if (!fullName || !email || !password || !confirmPassword) {
+        return showNotification('Please complete all fields', false);
+      }
+
+      if (password !== confirmPassword) {
+        return showNotification('Passwords do not match', false);
+      }
+
+      try {
+        await TravelLoopAPI.auth.register(fullName, email, password);
+        showNotification('Account created! Redirecting...');
+        window.location.href = 'My-Trip.html';
+      } catch (err) {
+        showNotification(err.message, false);
+      }
+    }
+
+    function socialLogin(provider) {
+      showNotification(`${provider} login coming soon!`, false);
+    }
+
+    // Init
+    loginPage.render();
+  </script>
+</body>
+
+</html>
